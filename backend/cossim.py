@@ -1,5 +1,5 @@
 from collections import defaultdict, Counter
-from helpers.MySQLDatabaseHandler import Book, MySQLDatabaseHandler, db
+#from helpers.MySQLDatabaseHandler import Book, MySQLDatabaseHandler, db
 import json
 import math
 import numpy as np
@@ -20,44 +20,41 @@ def tokenize(text: str):
     return rlst
 
 
-def tokenize_book_feats(book : Book):
-    """Returns a list of tokens contained in an entire transcript.
+# def tokenize_book_feats(book : Book):
+#     """Returns a list of tokens contained in an entire transcript.
 
 
-    Parameters
-    ----------
-    input_transcript : Book
-        class Book(db.Model):
-        __tablename__ = "books"
-        title = db.Column(db.String(150), nullable=False)
-        descript = db.Column(db.String(1900), nullable=False)
-        authors = db.Column(db.String(100), nullable=False)
-        publisher = db.Column(db.String(50), nullable=False)
-        categories = db.Column(db.String(50), nullable=False)
-        review_score = db.Column(db.String(15), nullable=False)
-        review_count = db.Column(db.String(15), nullable=False)
+#     Parameters
+#     ----------
+#     input_transcript : Book
+#         class Book(db.Model):
+#         __tablename__ = "books"
+#         title = db.Column(db.String(150), nullable=False)
+#         descript = db.Column(db.String(1900), nullable=False)
+#         authors = db.Column(db.String(100), nullable=False)
+#         publisher = db.Column(db.String(50), nullable=False)
+#         categories = db.Column(db.String(50), nullable=False)
+#         review_score = db.Column(db.String(15), nullable=False)
+#         review_count = db.Column(db.String(15), nullable=False)
 
 
-    Returns
-    -------
-    Dict[list[str]] --> Book[Feature[Token]]
-        A dict of lists of tokens representing each feature of one book.
-    """
-    features = dict()
-    features["categories"] = tokenize(book.categories)
-    features["authors"] = tokenize(book.authors)
-    features["publisher"] = tokenize(book.publisher)
-    features["descript"] = tokenize(book.descript)
-    return features
+#     Returns
+#     -------
+#     Dict[list[str]] --> Book[Feature[Token]]
+#         A dict of lists of tokens representing each feature of one book.
+#     """
+#     features = dict()
+#     features["categories"] = tokenize(book.categories)
+#     features["authors"] = tokenize(book.authors)
+#     features["publisher"] = tokenize(book.publisher)
+#     features["descript"] = tokenize(book.descript)
+#     return features
 
 
 #TODO: categories and authors sometimes have multiple fields; need to account for that
 
 
 #TODO: null fields
-
-
-
 
 def preprocess(query, n=3):
      
@@ -211,8 +208,6 @@ def preprocess(query, n=3):
             top_categories.append(reverse_categories_mappings[idx])
 
 
-
-
         # Now given a query we can iterate through all the authors and see which authors it is most likely to be present in
         query = query.split()
         total_prob_per_authors = np.ones((len(book_num_to_mappings)))
@@ -255,25 +250,34 @@ def preprocess(query, n=3):
 
 
 def build_idx_helper(idx_dict, tokenized_books_feats, feature):
-    for book, book_index in enumerate(tokenized_books_feats):
-        for token in book[feature]:
-            if token not in idx_dict:
-                idx_dict[token] = {book_index:1}
+    # for book_idx, book in enumerate(tokenized_books_feats):
+    #     for token in book[feature]:
+    #         if token not in idx_dict:
+    #             idx_dict[token] = {book_idx:1}
+    #         else:
+    #             if book_idx in idx_dict[token]:
+    #                 idx_dict[token][book_idx] += 1
+    #             else:
+    #                 idx_dict[token][book_idx] = 1
+    # for word in idx_dict:
+    #     lst = []
+    #     for doc_id in idx_dict[word]:
+    #         lst.append((doc_id, idx_dict[word][doc_id]))
+    #     idx_dict[word] = lst
+    # #return idx_dict   
+    for book_idx,book in enumerate(tokenized_books_feats):
+        token = book[feature]
+        term_count = Counter(token)
+        for term, count in term_count.items():
+            if term in idx_dict:
+                idx_dict[term].append((book_idx, count))
             else:
-                if book_index in idx_dict[token]:
-                    idx_dict[token][idx_dict] += 1
-                else:
-                    idx_dict[token][idx_dict] = 1
-    for word in idx_dict:
-        lst = []
-        for doc_id in idx_dict[word]:
-            lst.append((doc_id, idx_dict[word][doc_id]))
-        idx_dict[word] = lst
-    return idx_dict        
-
+                idx_dict[term] = [(book_idx, count)]
+    for term in idx_dict:
+        idx_dict[term].sort(key=lambda x: x[0])
+    return idx_dict     
 
 def build_inverted_indexes(tokenized_db_feats):
-    # YOUR CODE HERE
     authors_idx = {}
     publisher_idx = {}
     categories_idx = {}
@@ -285,85 +289,68 @@ def build_inverted_indexes(tokenized_db_feats):
     return authors_idx, publisher_idx, categories_idx
 
 
-
-
 def compute_idf(inv_idx, n_docs, min_df=5, max_df_ratio=0.95):
-    # YOUR CODE HERE
     idf = {}
-    for term in inv_idx:
-        df = len(inv_idx[term])
-        if df >= min_df:
-            if df/n_docs <= max_df_ratio:
-                frac = n_docs/(1+df)
-                idf[term] = math.log(frac, 2)
+    for term, doc_ids in inv_idx.items():
+        df = len(doc_ids)
+        if df >= min_df and df / n_docs <= max_df_ratio:
+            idf[term] = math.log2(n_docs / (1+df))
     return idf
 
 
 def compute_doc_norms(index, idf, n_docs):
-    # YOUR CODE HERE
-    norms = np.zeros((n_docs))
-    for word in index:
-        if word in idf:
-            idf_i = idf[word]
-            for j in index[word]:
-                tf_ij = j[1]
-                norms[j[0]] += (tf_ij*idf_i)**2
-    norms = norms**(1/2)
+    norms = np.zeros(n_docs)
+
+    for term, postings in index.items():
+        idf_value = idf.get(term, 0)
+
+        for doc_id, tf in postings:
+            norms[doc_id] += (tf * idf_value) ** 2
+
+    norms = np.sqrt(norms)
     return norms
-   
-   
 
 
 def accumulate_dot_scores(query_word_counts, index, idf):
-    # YOUR CODE HERE
     doc_scores = {}
-    for word in query_word_counts:
-        q_i = query_word_counts[word]
-        # print(word in index)
-        # print(index)
-        if word in index:
-            ind = index[word]
-            for doc in ind:
-                # print(doc)
-                doc_id = doc[0]
-                freq = doc[1]
+    for term, tf_query in query_word_counts.items():
+        if tf_query != 0:
+            idf_i = idf.get(term, 0)
+            postings = index.get(term, [])
+            for doc_id, tf_doc in postings:
+                score = (tf_doc) * (idf_i) ** 2 * tf_query
                 if doc_id in doc_scores:
-                    doc_scores[doc_id] += idf[word]*q_i*idf[word]*freq
+                    doc_scores[doc_id] += score
                 else:
-                    doc_scores[doc_id] = idf[word]*q_i*idf[word]*freq
-           
+                    doc_scores[doc_id] = score
     return doc_scores
 
 
-
-
-def index_search(query, index, idf, doc_norms, rating_dict, thumbs_dict, score_func=accumulate_dot_scores, tokenizer=tokenize):
-    # YOUR CODE HERE
-    def sortFirst(item):
-        return item[0]
-    lst = []
-    query_tokens = tokenizer.tokenize(query)
+def index_search(query, index, idf, doc_norms, rating_dict, thumbs_dict, score_func=accumulate_dot_scores):
+    query_tokens = tokenize(query.lower())
     query_word_counts = {}
-    for word in query_tokens:
-        if word in query_word_counts:
-            query_word_counts[word] += 1
+    for token in query_tokens:
+        if token in query_word_counts:
+            query_word_counts[token] += 1
         else:
-            query_word_counts[word] = 1
-           
-    scores = score_func(query_word_counts, index, idf)
+            query_word_counts[token] = 1
+    
+    doc_scores = score_func(query_word_counts, index, idf)
+    
     q_norm = 0
-    for word in query_word_counts:
-        if word in idf:
-            q_norm += (query_word_counts[word]*idf[word])**2
-    q_norm = q_norm**(1/2)
-    for doc_id in scores:
-        denom = q_norm*doc_norms[doc_id]
-        sc = (scores[doc_id]/denom)*(1+rating_dict[doc_id]*thumbs_dict[doc_id])
-        lst.append((sc, doc_id))
-    lst.sort(key=sortFirst, reverse=True)
-    return lst
+    for token, tf_freq in query_word_counts.items():
+        if token in idf:
+            num = (tf_freq * idf[token])**2
+            q_norm += num
+    q_norm = np.sqrt(q_norm)
+    results = []
+    for doc_id, score in doc_scores.items():
+        denominator = (q_norm * doc_norms[doc_id])
+        normalized_score = (score / denominator) *(1+rating_dict[doc_id]*thumbs_dict[doc_id])
+        results.append((normalized_score, doc_id))
 
-
+    results.sort(reverse=True)
+    return results
 
 
 def get_responses_from_results(response, results):
@@ -374,10 +361,3 @@ def get_responses_from_results(response, results):
         id = x[1]
         acc.append(response[id])
     return acc[:21]
-
-
-
-
-   
-
-
