@@ -30,7 +30,7 @@ CORS(app)
 # Sample search using json with pandas
 
 @app.route("/suggest")
-def json_search():
+def title_search():
     query = request.args.get("title")
     if query != None:
         books_df['Edit_distance'] = books_df['Title'].apply(
