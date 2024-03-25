@@ -124,12 +124,39 @@ def books_search():
 
     # creating final list based on common books between the three lists. Weights: authors > categories > descript
     combined_scores = {}
-    for title, score in authors_list:
-        combined_scores[title] = (score / avg_authors_score) * 5
-    for title, score in descript_list:
-        combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) 
-    for title, score in categories_list:
-        combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 4
+
+    # normal weights: (author, descript, categories: 0.5, 0.1, 0.4)
+    # weight if authors = "null": (author, descript, categories: 0.0, 0.3, 0.7)
+    if book_row["authors"] == "null" and book_row["descript"] != "null":
+        for title, score in authors_list:
+            combined_scores[title] = 0
+        for title, score in descript_list:
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) * 3
+        for title, score in categories_list:
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 7
+    # weight if descript = "null": (author, descript, categories: 0.55, 0.0, 0.45)
+    elif book_row["descript"] == "null" and book_row["authors"] != "null":
+        for title, score in authors_list:
+            combined_scores[title] = (score / avg_authors_score) * 5.5
+        for title, score in descript_list:
+            combined_scores[title] = 0
+        for title, score in categories_list:
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 4.5
+    # weight if both authors and descript = "null": (author, descript, categories: 0.0, 0.0, 1.0)
+    elif book_row["descript"] == "null" and book_row["descript"] == "null":
+        for title, score in authors_list:
+            combined_scores[title] = 0
+        for title, score in descript_list:
+            combined_scores[title] = 0
+        for title, score in categories_list:
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 10
+    else:
+        for title, score in authors_list:
+            combined_scores[title] = (score / avg_authors_score) * 5
+        for title, score in descript_list:
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) 
+        for title, score in categories_list:
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 4
 
 
     # Convert the dictionary to a sorted list of tuples
