@@ -3,7 +3,7 @@ from collections import defaultdict, Counter
 import json
 import math
 import numpy as np
-from IPython.core.display import HTML
+#from IPython.core.display import HTML
 
 import re
 from sklearn.feature_extraction.text import CountVectorizer
