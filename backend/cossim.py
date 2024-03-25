@@ -259,9 +259,9 @@ def process_books_df(books_df):
 
         # Store the tokenized data in a dictionary
         processed_record = {
-            'tokenized_authors': authors,
-            'tokenized_descript': descript,
-            'tokenized_categories': categories
+            'authors': authors,
+            'descript': descript,
+            'categories': categories
         }
 
         processed_data.append(processed_record)
