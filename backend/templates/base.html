@@ -119,10 +119,12 @@
         setTimeout(() => searchWrapper.classList.remove('active'), 200)
         );
 
-        function answerBoxTemplate(title, description, score) {
+        function answerBoxTemplate(title, author, categories, description, score) {
             return `
             <div class='recommendation-container'>
                 <h3 class='book-title'>${title}</h3>
+                <p class='book-author'>${author}</p>
+                <p class='book-categories'>${categories}</p>
                 <p class='book-description'>${description}</p>
                 <p class='book-review-score'>Review Score: ${score}</p>
             </div>`;
