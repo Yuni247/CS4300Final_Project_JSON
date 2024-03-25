@@ -168,6 +168,9 @@ def books_search():
 
     # Convert the dictionary to a sorted list of tuples
     combined_list = sorted(combined_scores.items(), key=lambda x: x[0], reverse=True)
+    for result in combined_list:
+        if result[0] == book_row["Title"]:
+            combined_list.remove(result)
 
     combined_df = pd.DataFrame(combined_list, columns=[ 'Title', 'cossim_score'])
     combined_df['Title'], books_df['Title'] = combined_df['Title'].astype(str), books_df['Title'].astype(str)
