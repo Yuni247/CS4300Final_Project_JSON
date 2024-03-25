@@ -65,12 +65,14 @@ def home():
 
 
 #input- input_book: row in books_df that was matched with the user's query input
-@app.route("/simsuggestions")
+@app.route("/books")
 def books_search():
-    input_book_title = request.args.get("input_book")  # Get the book title from query parameters
+    input_book_title = request.args.get("title")  # Get the book title from query parameters
 
     # Process the input book title to get the desired row in books_df
     book_row = books_df[books_df['Title'] == input_book_title].iloc[0]
+
+    print(book_row)
 
     tokenized_books_feats = process_books_df(books_df)
 
@@ -96,6 +98,7 @@ def books_search():
                 words[word] += 1
             else:
                 words[word] = 1
+        return words
     
     authors_inpbook_words, descript_inpbook_words, categories_inpbook_words = input_book_words(book_row, "authors"), input_book_words(book_row, "descript"), input_book_words(book_row, "categories")
 
@@ -112,37 +115,39 @@ def books_search():
         output_list = []
         for book in input_list:
             title = books_df.iloc[book[1]]['Title']
-            output_list.append((output_list[0], title))
+            output_list.append((title, book[0]))
         return output_list
     
     authors_list, descript_list, categories_list = id_to_titles(authors_list), id_to_titles(descript_list), id_to_titles(categories_list)
     
     # Calculate average scores
-    avg_authors_score = sum(score for score, _ in authors_list) / len(authors_list)
-    avg_descript_score = sum(score for score, _ in descript_list) / len(descript_list)
-    avg_categories_score = sum(score for score, _ in categories_list) / len(categories_list)
+    avg_authors_score = sum(score for _, score in authors_list) / len(authors_list)
+    avg_descript_score = sum(score for _, score in descript_list) / len(descript_list)
+    avg_categories_score = sum(score for _, score in categories_list) / len(categories_list)
 
     # creating final list based on common books between the three lists. Weights: authors > categories > descript
     combined_scores = {}
-    for score, title in authors_list:
+    for title, score in authors_list:
         combined_scores[title] = (score / avg_authors_score) * 5
-    for score, title in descript_list:
-        combined_scores[title] += (score / avg_descript_score) * 4
-    for score, title in categories_list:
-        combined_scores[title] += (score / avg_categories_score)
+    for title, score in descript_list:
+        combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) 
+    for title, score in categories_list:
+        combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 4
+
 
     # Convert the dictionary to a sorted list of tuples
-    combined_list = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
+    combined_list = sorted(combined_scores.items(), key=lambda x: x[0], reverse=True)
 
-    ranked_results = combined_list.head(10)
-    # for now round it to nearest 2 decimal places for uniformity, can change later
-    ranked_results.loc[:, 'review_score'] = ranked_results['review_score'].round(2)
+    combined_df = pd.DataFrame(combined_list, columns=[ 'Title', 'cossim_score'])
+    combined_df['Title'], books_df['Title'] = combined_df['Title'].astype(str), books_df['Title'].astype(str)
 
-    top_recs = ranked_results[[
-        'Title', 'descript', 'review_score']]
+    final_df = pd.merge(combined_df, books_df[['Title', 'authors', 'categories', 'descript', 'review_score']], on='Title', how='left')
+    top_recs = final_df.sort_values(by='cossim_score', ascending=False).head(10)
 
-    return top_recs.to_json(orient='records')
+    top_recs['cossim_score'] = top_recs['cossim_score'].round(2)
 
+    top_recs_json = top_recs.to_json(orient='records')
+    return top_recs_json
 
 
 if 'DB_NAME' not in os.environ:
