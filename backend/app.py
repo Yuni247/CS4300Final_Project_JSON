@@ -90,11 +90,18 @@ def books_search():
 
     def input_book_words(input_book, feature):
         words = {}
-        for word in tokenize(input_book[feature]):
-            if word in words:
-                words[word] += 1
-            else:
-                words[word] = 1
+        if feature == "authors":
+            for word in tokenize_authors(input_book[feature]):
+                if word in words:
+                    words[word] += 1
+                else:
+                    words[word] = 1
+        else:
+            for word in tokenize(input_book[feature]):
+                if word in words:
+                    words[word] += 1
+                else:
+                    words[word] = 1
         return words
     
     authors_inpbook_words, descript_inpbook_words, categories_inpbook_words = input_book_words(book_row, "authors"), input_book_words(book_row, "descript"), input_book_words(book_row, "categories")
