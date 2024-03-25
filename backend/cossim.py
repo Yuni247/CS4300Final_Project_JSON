@@ -6,9 +6,9 @@ import numpy as np
 #from IPython.core.display import HTML
 
 import re
-from sklearn.feature_extraction.text import CountVectorizer
-import os.path
-import pickle
+#from sklearn.feature_extraction.text import CountVectorizer
+#import os.path
+#import pickle
 
 
 def tokenize(text: str):
