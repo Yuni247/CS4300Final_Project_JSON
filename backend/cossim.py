@@ -19,6 +19,18 @@ def tokenize(text: str):
       rlst.append(word.lower())
     return rlst
 
+def tokenize_authors(text: str):
+    # Remove the square brackets and single quotes from the string
+    cleaned_text = text.replace("[", "").replace("]", "").replace("'", "")
+    
+    # Split the string into individual authors based on the comma separator
+    authors = cleaned_text.split(", ")
+    
+    # Convert each author name to lowercase
+    authors = [author.lower() for author in authors]
+    
+    return authors
+
 
 # def tokenize_book_feats(book : Book):
 #     """Returns a list of tokens contained in an entire transcript.
@@ -253,7 +265,7 @@ def process_books_df(books_df):
 
     # Iterate through each row in the DataFrame
     for index, row in books_df.iterrows():
-        authors = tokenize(row['authors'])
+        authors = tokenize_authors(row['authors'])
         descript = tokenize(row['descript'])
         categories = tokenize(row['categories'])
 
