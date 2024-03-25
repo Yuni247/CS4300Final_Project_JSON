@@ -24,15 +24,26 @@ with open(json_file_path, 'r') as file:
     data = json.load(file)
     books_df = pd.DataFrame(data)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app)
 
-# Sample search using json with pandas
+# # Sample search using json with pandas
+# def get_books_titles():
+
+#     titles = []
+#     for bk in data:
+#         titles.append(bk["Title"])
+
+#     with open("books_titles", "w") as jsonf:
+#         jsonf.write(json.dumps(titles))
+
+#print(get_books_titles())
 
 @app.route("/suggest")
 def title_search():
     query = request.args.get("title")
     if query != None:
+        # print(query.lower())
         books_df['Edit_distance'] = books_df['Title'].apply(
             lambda book: lev.distance(query.lower(), book.lower()))
 
@@ -48,13 +59,30 @@ def title_search():
         return top_recs.to_json(orient='records')
     return []
 
-def json_search(query):
-    results = []
-    for book in data:
-        if query.lower() in book["Title"].lower():
-            results.append(book)
+# def json_search(query):
+#     r_score_dict = {}
+#     r_count_dict = {}
+#     for doc_id,response in enumerate(responses):
+#         desc = response['descript']
+#         descript_toks = TreebankWordTokenizer().tokenize(desc)
+#         response['toks'] = descript_toks
+#         r_score_dict[doc_id] = response['review_score']
+#         r_count_dict[doc_id] = response['review_count']
+    
 
-    return json.dumps(results)
+#     inv_idx = build_inverted_indexes(responses)
+#     idf_author = compute_idf(inv_idx=inv_idx[2], n_docs=len(responses))
+#     doc_norms = compute_doc_norms(inv_idx[2], idf_author, len(responses))
+
+#     results = index_search(query, inv_idx[2], idf_author, doc_norms, r_score_dict, r_count_dict)
+#     for i in results:
+#         score = i[0]
+#         id = i[1]
+        
+#         responses[id]['cosine'] = score
+#     user_results = get_responses_from_results(responses, results)
+#     #print(user_results)
+#     return user_results
 
 @app.route("/")
 def home():
@@ -65,31 +93,8 @@ def home():
 def books_search():
     query = request.args.get("title")
     responses = json.loads(json_search(query))
-    #print(responses)
-    r_score_dict = {}
-    r_count_dict = {}
-    for doc_id,response in enumerate(responses):
-        desc = response['descript']
-        descript_toks = TreebankWordTokenizer().tokenize(desc)
-        response['toks'] = descript_toks
-        r_score_dict[doc_id] = response['review_score']
-        r_count_dict[doc_id] = response['review_count']
+    return responses
     
-    inv_idx = build_inverted_indexes(responses)
- 
-    idf_author = compute_idf(inv_idx=inv_idx[0], n_docs=len(responses))
-
-    doc_norms = compute_doc_norms(inv_idx[0], idf_author, len(responses))
-
-    results = index_search(query, inv_idx[0], idf_author, doc_norms, r_score_dict, r_count_dict)
-    for i in results:
-        score = i[0]
-        id = i[1]
-        
-        responses[id]['cosine'] = score
-    user_results = get_responses_from_results(responses, results)
-    return user_results
-
 
 if 'DB_NAME' not in os.environ:
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5217)

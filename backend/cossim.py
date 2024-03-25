@@ -56,197 +56,195 @@ def tokenize(text: str):
 
 #TODO: null fields
 
-def preprocess(query, n=3):
+# def preprocess(query, n=3):
      
-        top_categories = []
-        top_authors = []
-        top_publisher = []
+#         top_categories = []
+#         top_authors = []
+#         top_publisher = []
 
 
-        books = [book.serialize() for book in Book.query.all()]
+#         books = [book.serialize() for book in Book.query.all()]
 
 
-        # the labels here are the genres
-        # categories_mappings maps each categories to an index, authors_mappings maps each author(s) to an index, publisher_mappings maps each publisher to an index
+#         # the labels here are the genres
+#         # categories_mappings maps each categories to an index, authors_mappings maps each author(s) to an index, publisher_mappings maps each publisher to an index
 
 
-        categories_mappings = {}
-        authors_mappings = {}
-        publisher_mappings = {}
-        descript_lst = []
-        book_num_to_mappings = {}
-        # book_num_to_mappings is a dict that maps each book id (generated) to a tuple of categories, authors, publisher
-        count = 0
+#         categories_mappings = {}
+#         authors_mappings = {}
+#         publisher_mappings = {}
+#         descript_lst = []
+#         book_num_to_mappings = {}
+#         # book_num_to_mappings is a dict that maps each book id (generated) to a tuple of categories, authors, publisher
+#         count = 0
 
 
-        for book in books:      
+#         for book in books:      
 
 
-            if book['categories'] not in categories_mappings:
-                categories_mappings[book['categories']] = len(categories_mappings)
+#             if book['categories'] not in categories_mappings:
+#                 categories_mappings[book['categories']] = len(categories_mappings)
 
 
-            book_num_to_mappings[count] = (categories_mappings[book['categories']], authors_mappings[book['authors']], publisher_mappings[book['publisher']])
-            count += 1
+#             book_num_to_mappings[count] = (categories_mappings[book['categories']], authors_mappings[book['authors']], publisher_mappings[book['publisher']])
+#             count += 1
 
 
-            descript_lst.append(book["descript"])
+#             descript_lst.append(book["descript"])
 
 
-        vectorizer = CountVectorizer(max_df=0.7, min_df=1)
+#         vectorizer = CountVectorizer(max_df=0.7, min_df=1)
 
 
-        #vectors is an array where the rows represent book descripts and the columns are words in the corpus
-        #dimension of vectors is 734 x num features
-        vectors = np.array(vectorizer.fit_transform(descript_lst).toarray())
-        features = vectorizer.get_feature_names()
-
-
-
-
-        # genre_count gives probability of book in that categories P(label = y)
-        categories_count, authors_count, publisher_count = np.zeros(len(categories_mappings)), np.zeros(len(authors_mappings)), np.zeros(len(publisher_mappings))
-        for book in books:
-            index = categories_mappings[books['categories']]
-            categories_count[index] += 1
-            authors_count[index] += 1
-            publisher_count[index] += 1
-
-
-        for i in range(len(categories_count)):
-            categories_count[i] /= len(books)
-        for i in range(len(authors_count)):
-            authors_count[i] /= len(books)
-        for i in range(len(publisher_count)):
-            publisher_count[i] /= len(books)
+#         #vectors is an array where the rows represent book descripts and the columns are words in the corpus
+#         #dimension of vectors is 734 x num features
+#         vectors = np.array(vectorizer.fit_transform(descript_lst).toarray())
+#         features = vectorizer.get_feature_names()
 
 
 
 
-        #First we implement Add-1 smoothing so that we don't get non-zero probabilities
-        # vectors = vectors + 1
+#         # genre_count gives probability of book in that categories P(label = y)
+#         categories_count, authors_count, publisher_count = np.zeros(len(categories_mappings)), np.zeros(len(authors_mappings)), np.zeros(len(publisher_mappings))
+#         for book in books:
+#             index = categories_mappings[books['categories']]
+#             categories_count[index] += 1
+#             authors_count[index] += 1
+#             publisher_count[index] += 1
 
 
-        total_counts = np.sum(vectors, axis = 0)
+#         for i in range(len(categories_count)):
+#             categories_count[i] /= len(books)
+#         for i in range(len(authors_count)):
+#             authors_count[i] /= len(books)
+#         for i in range(len(publisher_count)):
+#             publisher_count[i] /= len(books)
 
 
-        if not os.path.exists('categories_prob.txt'):
-            # [label]_word_prob gives probability of word occuring given genre P(X | Y)
-            categories_word_prob = np.zeros((len(categories_mappings), len(vectors[0])))
+
+
+#         #First we implement Add-1 smoothing so that we don't get non-zero probabilities
+#         # vectors = vectors + 1
+
+
+#         total_counts = np.sum(vectors, axis = 0)
+
+
+#         if not os.path.exists('categories_prob.txt'):
+#             # [label]_word_prob gives probability of word occuring given genre P(X | Y)
+#             categories_word_prob = np.zeros((len(categories_mappings), len(vectors[0])))
            
-            #Now we loop through each of the labels in the corpus and for each of the categories we find the label_word_prob
-            for i in range(len(categories_mappings)):
-                for word_num in range(len(vectors[0])):
-                    sum = 0
-                    for row in range(len(vectors)):
-                            sum += vectors[row][word_num] if book_num_to_mappings[row][0] == i else 0
-                    categories_word_prob[i][word_num] = sum / total_counts[word_num]
+#             #Now we loop through each of the labels in the corpus and for each of the categories we find the label_word_prob
+#             for i in range(len(categories_mappings)):
+#                 for word_num in range(len(vectors[0])):
+#                     sum = 0
+#                     for row in range(len(vectors)):
+#                             sum += vectors[row][word_num] if book_num_to_mappings[row][0] == i else 0
+#                     categories_word_prob[i][word_num] = sum / total_counts[word_num]
 
 
-            pickle.dump(categories_word_prob, open("categories_prob.txt", 'wb'))
+#             pickle.dump(categories_word_prob, open("categories_prob.txt", 'wb'))
 
 
-        categories_word_prob = pickle.load(open("categories_prob.txt", 'rb'))
+#         categories_word_prob = pickle.load(open("categories_prob.txt", 'rb'))
 
 
-        if not os.path.exists('authors_prob.txt'):
-            # [label]_word_prob gives probability of word occuring given [label] P(X | Y)
-            authors_word_prob = np.zeros((len(authors_mappings), len(vectors[0])))
+#         if not os.path.exists('authors_prob.txt'):
+#             # [label]_word_prob gives probability of word occuring given [label] P(X | Y)
+#             authors_word_prob = np.zeros((len(authors_mappings), len(vectors[0])))
            
-            #Now we loop through each of the labels in the corpus and for each of the categories we find the label_word_prob
-            for i in range(len(authors_mappings)):
-                for word_num in range(len(vectors[0])):
-                    sum = 0
-                    for row in range(len(vectors)):
-                            sum += vectors[row][word_num] if book_num_to_mappings[row][1] == i else 0
-                    authors_word_prob[i][word_num] = sum / total_counts[word_num]
+#             #Now we loop through each of the labels in the corpus and for each of the categories we find the label_word_prob
+#             for i in range(len(authors_mappings)):
+#                 for word_num in range(len(vectors[0])):
+#                     sum = 0
+#                     for row in range(len(vectors)):
+#                             sum += vectors[row][word_num] if book_num_to_mappings[row][1] == i else 0
+#                     authors_word_prob[i][word_num] = sum / total_counts[word_num]
 
 
-            pickle.dump(authors_word_prob, open("authors_prob.txt", 'wb'))
-        authors_word_prob = pickle.load(open("authors_prob.txt", 'rb'))
+#             pickle.dump(authors_word_prob, open("authors_prob.txt", 'wb'))
+#         authors_word_prob = pickle.load(open("authors_prob.txt", 'rb'))
 
 
 
 
-        if not os.path.exists('publisher_prob.txt'):
-            # [label]_word_prob gives probability of word occuring given genre P(X | Y)
-            publisher_word_prob = np.zeros((len(publisher_mappings), len(vectors[0])))
+#         if not os.path.exists('publisher_prob.txt'):
+#             # [label]_word_prob gives probability of word occuring given genre P(X | Y)
+#             publisher_word_prob = np.zeros((len(publisher_mappings), len(vectors[0])))
            
-            #Now we loop through each of the labels in the corpus and for each of the categories we find the label_word_prob
-            for i in range(len(publisher_mappings)):
-                for word_num in range(len(vectors[0])):
-                    sum = 0
-                    for row in range(len(vectors)):
-                            sum += vectors[row][word_num] if book_num_to_mappings[row][2] == i else 0
-                    publisher_word_prob[i][word_num] = sum / total_counts[word_num]
+#             #Now we loop through each of the labels in the corpus and for each of the categories we find the label_word_prob
+#             for i in range(len(publisher_mappings)):
+#                 for word_num in range(len(vectors[0])):
+#                     sum = 0
+#                     for row in range(len(vectors)):
+#                             sum += vectors[row][word_num] if book_num_to_mappings[row][2] == i else 0
+#                     publisher_word_prob[i][word_num] = sum / total_counts[word_num]
 
 
-            pickle.dump(publisher_word_prob, open("publisher_prob.txt", 'wb'))
+#             pickle.dump(publisher_word_prob, open("publisher_prob.txt", 'wb'))
 
 
-        publisher_word_prob = pickle.load(open("publisher_prob.txt", 'rb'))
-
-
-
+#         publisher_word_prob = pickle.load(open("publisher_prob.txt", 'rb'))
 
 
 
-        # Now given a query we can iterate through all the categories and see which categories it is most likely to be present in
-        query = query.split()
-        total_prob_per_categories = np.ones((len(book_num_to_mappings)))
-        for i in range(len(book_num_to_mappings)):
-            for word in query:
-                if word in features:
-                    index = features.index(word)
-                    total_prob_per_categories[i] *= categories_word_prob[i][index]
-            total_prob_per_categories[i] *= categories_count[i]
+
+
+
+#         # Now given a query we can iterate through all the categories and see which categories it is most likely to be present in
+#         query = query.split()
+#         total_prob_per_categories = np.ones((len(book_num_to_mappings)))
+#         for i in range(len(book_num_to_mappings)):
+#             for word in query:
+#                 if word in features:
+#                     index = features.index(word)
+#                     total_prob_per_categories[i] *= categories_word_prob[i][index]
+#             total_prob_per_categories[i] *= categories_count[i]
        
-        most_likely_n = np.argsort(total_prob_per_categories)[::-1]
-        reverse_categories_mappings = {value[0]: key for key, value in book_num_to_mappings.items()}
+#         most_likely_n = np.argsort(total_prob_per_categories)[::-1]
+#         reverse_categories_mappings = {value[0]: key for key, value in book_num_to_mappings.items()}
        
-        for idx in most_likely_n:
-            top_categories.append(reverse_categories_mappings[idx])
+#         for idx in most_likely_n:
+#             top_categories.append(reverse_categories_mappings[idx])
 
 
-        # Now given a query we can iterate through all the authors and see which authors it is most likely to be present in
-        query = query.split()
-        total_prob_per_authors = np.ones((len(book_num_to_mappings)))
-        for i in range(len(book_num_to_mappings)):
-            for word in query:
-                if word in features:
-                    index = features.index(word)
-                    total_prob_per_authors[i] *= authors_word_prob[i][index]
-            total_prob_per_authors[i] *= authors_count[i]
+#         # Now given a query we can iterate through all the authors and see which authors it is most likely to be present in
+#         query = query.split()
+#         total_prob_per_authors = np.ones((len(book_num_to_mappings)))
+#         for i in range(len(book_num_to_mappings)):
+#             for word in query:
+#                 if word in features:
+#                     index = features.index(word)
+#                     total_prob_per_authors[i] *= authors_word_prob[i][index]
+#             total_prob_per_authors[i] *= authors_count[i]
        
-        most_likely_n = np.argsort(total_prob_per_authors)[::-1]
-        reverse_authors_mappings = {value[1]: key for key, value in book_num_to_mappings.items()}
+#         most_likely_n = np.argsort(total_prob_per_authors)[::-1]
+#         reverse_authors_mappings = {value[1]: key for key, value in book_num_to_mappings.items()}
        
-        for idx in most_likely_n:
-            top_authors.append(reverse_authors_mappings[idx])
+#         for idx in most_likely_n:
+#             top_authors.append(reverse_authors_mappings[idx])
 
 
 
 
-        # Now given a query we can iterate through all the publisher and see which publisher it is most likely to be present in
-        query = query.split()
-        total_prob_per_publisher = np.ones((len(book_num_to_mappings)))
-        for i in range(len(book_num_to_mappings)):
-            for word in query:
-                if word in features:
-                    index = features.index(word)
-                    total_prob_per_publisher[i] *= publisher_word_prob[i][index]
-            total_prob_per_publisher[i] *= publisher_count[i]
+#         # Now given a query we can iterate through all the publisher and see which publisher it is most likely to be present in
+#         query = query.split()
+#         total_prob_per_publisher = np.ones((len(book_num_to_mappings)))
+#         for i in range(len(book_num_to_mappings)):
+#             for word in query:
+#                 if word in features:
+#                     index = features.index(word)
+#                     total_prob_per_publisher[i] *= publisher_word_prob[i][index]
+#             total_prob_per_publisher[i] *= publisher_count[i]
        
-        most_likely_n = np.argsort(total_prob_per_publisher)[::-1]
-        reverse_publisher_mappings = {value[2]: key for key, value in book_num_to_mappings.items()}
+#         most_likely_n = np.argsort(total_prob_per_publisher)[::-1]
+#         reverse_publisher_mappings = {value[2]: key for key, value in book_num_to_mappings.items()}
        
-        for idx in most_likely_n:
-            top_publisher.append(reverse_publisher_mappings[idx])
+#         for idx in most_likely_n:
+#             top_publisher.append(reverse_publisher_mappings[idx])
 
 
-        return top_categories[:n], top_authors[:n], top_publisher[:n]
-
-
+#         return top_categories[:n], top_authors[:n], top_publisher[:n]
 
 
 def build_idx_helper(idx_dict, tokenized_books_feats, feature):
@@ -276,6 +274,7 @@ def build_idx_helper(idx_dict, tokenized_books_feats, feature):
     for term in idx_dict:
         idx_dict[term].sort(key=lambda x: x[0])
     return idx_dict     
+
 
 def build_inverted_indexes(tokenized_db_feats):
     authors_idx = {}
