@@ -119,10 +119,12 @@
         setTimeout(() => searchWrapper.classList.remove('active'), 200)
         );
 
-        function answerBoxTemplate(title, description, score) {
+        function answerBoxTemplate(title, authors, categories, description, score) {
             return `
             <div class='recommendation-container'>
                 <h3 class='book-title'>${title}</h3>
+                <p class='book-authors'>${authors}</p>
+                <p class='book-categories'>${categories}</p>
                 <p class='book-description'>${description}</p>
                 <p class='book-review-score'>Review Score: ${score}</p>
             </div>`;
@@ -151,9 +153,9 @@
                         let output_div = document.getElementById("answer-box")
                         //console.log(data)
                         document.getElementById("answer-box").innerHTML = "";
-                        data.slice(0, 5).forEach(row => {
+                        data.slice(0, 10).forEach(row => {
                             let tempDiv = document.createElement("div");
-                            tempDiv.innerHTML = answerBoxTemplate(row.Title, row.descript, row.review_score);
+                            tempDiv.innerHTML = answerBoxTemplate(row.Title, row.authors, row.categories, row.descript, row.review_score);
                             document.getElementById("answer-box").appendChild(tempDiv);
                         });
                     });
