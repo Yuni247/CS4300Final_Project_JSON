@@ -71,9 +71,6 @@ def books_search():
 
     # Process the input book title to get the desired row in books_df
     book_row = books_df[books_df['Title'] == input_book_title].iloc[0]
-
-    print(book_row)
-
     tokenized_books_feats = process_books_df(books_df)
 
     # Build inverted indexes for each feature
