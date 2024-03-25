@@ -247,6 +247,28 @@ def tokenize(text: str):
 #         return top_categories[:n], top_authors[:n], top_publisher[:n]
 
 
+
+def process_books_df(books_df):
+    processed_data = []
+
+    # Iterate through each row in the DataFrame
+    for index, row in books_df.iterrows():
+        authors = tokenize(row['authors'])
+        descript = tokenize(row['descript'])
+        categories = tokenize(row['categories'])
+
+        # Store the tokenized data in a dictionary
+        processed_record = {
+            'tokenized_authors': authors,
+            'tokenized_descript': descript,
+            'tokenized_categories': categories
+        }
+
+        processed_data.append(processed_record)
+
+    return processed_data
+
+
 def build_idx_helper(idx_dict, tokenized_books_feats, feature):
     # for book_idx, book in enumerate(tokenized_books_feats):
     #     for token in book[feature]:
@@ -278,14 +300,14 @@ def build_idx_helper(idx_dict, tokenized_books_feats, feature):
 
 def build_inverted_indexes(tokenized_db_feats):
     authors_idx = {}
-    publisher_idx = {}
+    descript_idx = {}
     categories_idx = {}
     # go thru each book (dict) in the list
     # output 3 inverted indexes (one for each feat)
     authors_idx = build_idx_helper(authors_idx, tokenized_db_feats, "authors")
-    publisher_idx = build_idx_helper(publisher_idx, tokenized_db_feats, "publisher")
+    descript_idx = build_idx_helper(descript_idx, tokenized_db_feats, "descript")
     categories_idx = build_idx_helper(categories_idx, tokenized_db_feats, "categories")
-    return authors_idx, publisher_idx, categories_idx
+    return authors_idx, descript_idx, categories_idx
 
 
 def compute_idf(inv_idx, n_docs, min_df=5, max_df_ratio=0.95):
@@ -325,17 +347,7 @@ def accumulate_dot_scores(query_word_counts, index, idf):
     return doc_scores
 
 
-def index_search(query, index, idf, doc_norms, rating_dict, thumbs_dict, score_func=accumulate_dot_scores):
-    query_tokens = tokenize(query.lower())
-    query_word_counts = {}
-    for token in query_tokens:
-        if token in query_word_counts:
-            query_word_counts[token] += 1
-        else:
-            query_word_counts[token] = 1
-    
-    doc_scores = score_func(query_word_counts, index, idf)
-    
+def index_search(query_word_counts, doc_scores, idf, doc_norms):
     q_norm = 0
     for token, tf_freq in query_word_counts.items():
         if token in idf:
@@ -345,15 +357,16 @@ def index_search(query, index, idf, doc_norms, rating_dict, thumbs_dict, score_f
     results = []
     for doc_id, score in doc_scores.items():
         denominator = (q_norm * doc_norms[doc_id])
-        normalized_score = (score / denominator) *(1+rating_dict[doc_id]*thumbs_dict[doc_id])
+        normalized_score = (score / denominator) 
         results.append((normalized_score, doc_id))
 
     results.sort(reverse=True)
     return results
 
 
+
 def get_responses_from_results(response, results):
-    # Take results of index search and get list of attractions
+    # Take results of index search and get list of books
     acc = []
     # print(results)
     for x in results:
