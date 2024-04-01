@@ -259,8 +259,58 @@ def tokenize_authors(text: str):
 #         return top_categories[:n], top_authors[:n], top_publisher[:n]
 
 
+# ----------------------------------------------------------------------------------------
+
+
+"""
+
+def boolean_search(query_word: str, not_word: str, inverted_index: dict) -> List[int]:
+    """"""Search the collection of documents for the given query_word
+        provided that the documents do not include the not_word
+
+    Arguments
+    =========
+
+    query_word: string,
+        The word we are searching for in our documents.
+
+    not_word: string,
+        The word excluded from our documents.
+
+    index: an inverted index as above
+
+
+    Returns
+    =======
+
+    results: list of ints
+        Sorted List of results (in increasing order) such that every element is a `doc_id`
+        that points to a document that satisfies the boolean
+        expression of the query."""
+"""
+    # TODO-4.1
+    
+    if query_word not in inverted_index.keys():
+      return []
+    q_list = inverted_index[query_word]
+    if not_word not in inverted_index.keys():
+      return sorted([d_tup[0] for d_tup in q_list])
+    n_list = inverted_index[not_word]
+    q_list, n_list = [d_tup[0] for d_tup in q_list], [d_tup[0] for d_tup in n_list]
+    results = sorted([d for d in q_list if d not in n_list])
+    return results
+
+"""
+
+
+
+
+
+
+
 
 def process_books_df(books_df):
+    print("STARTED PROCESSING DATABASE")
     processed_data = []
 
     # Iterate through each row in the DataFrame
@@ -311,15 +361,15 @@ def build_idx_helper(idx_dict, tokenized_books_feats, feature):
 
 
 def build_inverted_indexes(tokenized_db_feats):
-    authors_idx = {}
+    print("STARTED BUILDING INV INDEXES")
     descript_idx = {}
     categories_idx = {}
     # go thru each book (dict) in the list
-    # output 3 inverted indexes (one for each feat)
-    authors_idx = build_idx_helper(authors_idx, tokenized_db_feats, "authors")
+    # output 2 inverted indexes (one for each feat)
     descript_idx = build_idx_helper(descript_idx, tokenized_db_feats, "descript")
     categories_idx = build_idx_helper(categories_idx, tokenized_db_feats, "categories")
-    return authors_idx, descript_idx, categories_idx
+    print("FINISHED BUILDING INV INDEXES")
+    return descript_idx, categories_idx
 
 
 def compute_idf(inv_idx, n_docs, min_df=5, max_df_ratio=0.95):
@@ -378,6 +428,7 @@ def index_search(query_word_counts, doc_scores, idf, doc_norms):
 
 
 def get_responses_from_results(response, results):
+    print("STARTED GETTING RESPONSES")
     # Take results of index search and get list of books
     acc = []
     # print(results)

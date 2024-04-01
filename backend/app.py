@@ -72,46 +72,47 @@ def books_search():
     # Process the input book title to get the desired row in books_df
     book_row = books_df[books_df['Title'] == input_book_title].iloc[0]
     tokenized_books_feats = process_books_df(books_df)
+    # tokenized_books_feats --> list of dicts of tokenized ["authors"], ["descript"], ["categories"] strings (each book has a dict)
 
     # Build inverted indexes for each feature
-    authors_idx, descript_idx, categories_idx = build_inverted_indexes(tokenized_books_feats)
+    descript_idx, categories_idx = build_inverted_indexes(tokenized_books_feats)
 
     num_rows = len(books_df)
 
     # Calculate idfs for each feature
-    authors_idf = compute_idf(authors_idx, num_rows, min_df=5, max_df_ratio=0.95)
     descript_idf = compute_idf(descript_idx, num_rows, min_df=5, max_df_ratio=0.95)
     categories_idf = compute_idf(categories_idx, num_rows, min_df=5, max_df_ratio=0.95)
 
     # calculate doc norms for each feat
-    authors_d_norms = compute_doc_norms(authors_idx, authors_idf, num_rows)
     descript_d_norms = compute_doc_norms(descript_idx, descript_idf, num_rows)
     categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
 
     def input_book_words(input_book, feature):
         words = {}
-        if feature == "authors":
-            for word in tokenize_authors(input_book[feature]):
-                if word in words:
-                    words[word] += 1
-                else:
-                    words[word] = 1
-        else:
-            for word in tokenize(input_book[feature]):
-                if word in words:
-                    words[word] += 1
-                else:
-                    words[word] = 1
+        for word in tokenize(input_book[feature]):
+            if word in words:
+                words[word] += 1
+            else:
+                words[word] = 1
         return words
     
-    authors_inpbook_words, descript_inpbook_words, categories_inpbook_words = input_book_words(book_row, "authors"), input_book_words(book_row, "descript"), input_book_words(book_row, "categories")
+    descript_inpbook_words, categories_inpbook_words = input_book_words(book_row, "descript"), input_book_words(book_row, "categories")
 
-    authors_scores = accumulate_dot_scores(authors_inpbook_words, authors_idx, authors_idf)
     descript_scores = accumulate_dot_scores(descript_inpbook_words, descript_idx, descript_idf)
     categories_scores = accumulate_dot_scores(categories_inpbook_words, categories_idx, categories_idf)
 
-    # Top 20 results for each cossim comparison (authors, descript, and categories)
-    authors_list = index_search(authors_inpbook_words, authors_scores, authors_idf, authors_d_norms)[0:30]
+    # Use Jaccard Similarity for authors (each author token is a single author, inside a list of toks for each book)
+    authors_scores = []
+    for id, book in enumerate(tokenized_books_feats):
+        tok_df_authors = book["authors"]
+        tok_inp_authors = tokenize_authors(book_row["authors"])
+        intersection = list(set(tok_df_authors) & set(tok_inp_authors))
+        union = list(set(tok_df_authors) | set(tok_inp_authors))
+        score = len(intersection) / len(union)
+        authors_scores.append((score, id))
+
+    # Top 30 results for each cossim comparison (authors, descript, and categories)
+    authors_list = sorted(authors_scores, key=lambda x: x[0], reverse=True)[0:30]
     descript_list = index_search(descript_inpbook_words, descript_scores, descript_idf, descript_d_norms)[0:30]
     categories_list = index_search(categories_inpbook_words, categories_scores, categories_idf, categories_d_norms)[0:30]
 
@@ -132,7 +133,7 @@ def books_search():
     # creating final list based on common books between the three lists. Weights: authors > categories > descript
     combined_scores = {}
 
-    # normal weights: (author, descript, categories: 0.5, 0.1, 0.4)
+    # normal weights: (author, descript, categories: 0.6, 0.1, 0.3)
     # weight if authors = "null": (author, descript, categories: 0.0, 0.3, 0.7)
     if book_row["authors"] == "null" and book_row["descript"] != "null":
         for title, score in authors_list:
@@ -157,13 +158,14 @@ def books_search():
             combined_scores[title] = 0
         for title, score in categories_list:
             combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 10
+    # Local change only (change this after p03 deadline), Bone by Bone author feature was wrongly overtaken by categories + descript. 
     else:
         for title, score in authors_list:
-            combined_scores[title] = (score / avg_authors_score) * 5
+            combined_scores[title] = (score / avg_authors_score) * 6
         for title, score in descript_list:
             combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) 
         for title, score in categories_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 4
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 3
 
 
     # Convert the dictionary to a sorted list of tuples
