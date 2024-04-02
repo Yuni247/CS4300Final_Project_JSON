@@ -327,7 +327,7 @@ def process_books_df(books_df):
         }
 
         processed_data.append(processed_record)
-
+    print("FINISHED PROCESSING DATABASE")
     return processed_data
 
 

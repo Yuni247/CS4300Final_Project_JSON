@@ -166,8 +166,7 @@ def books_search():
             combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) 
         for title, score in categories_list:
             combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 3
-
-
+    
     # Convert the dictionary to a sorted list of tuples
     combined_list = sorted(combined_scores.items(), key=lambda x: x[0], reverse=True)
     for result in combined_list:
@@ -177,12 +176,18 @@ def books_search():
     combined_df = pd.DataFrame(combined_list, columns=[ 'Title', 'cossim_score'])
     combined_df['Title'], books_df['Title'] = combined_df['Title'].astype(str), books_df['Title'].astype(str)
 
-    final_df = pd.merge(combined_df, books_df[['Title', 'authors', 'categories', 'descript', 'review_score']], on='Title', how='left')
+    final_df = pd.merge(combined_df, books_df[['Title', 'authors', 'categories', 'descript', 'review_score', 'review_count']], on='Title', how='left')
+    
+    # sort the final df by the cossim scores, take only the top 10
     top_recs = final_df.sort_values(by='cossim_score', ascending=False).head(10)
 
-    top_recs['cossim_score'] = top_recs['cossim_score'].round(2)
+    # review_score and review_count ranking system added
+    top_recs['Weighted_Score'] = top_recs['review_score'] + np.log(top_recs['review_count'])
+    top_recs_w_reviews = top_recs.sort_values(by='Weighted_Score', ascending=False)
 
-    top_recs_json = top_recs.to_json(orient='records')
+    top_recs_w_reviews['cossim_score'], top_recs_w_reviews['Weighted_Score'] = top_recs_w_reviews['cossim_score'].round(2), top_recs_w_reviews['Weighted_Score'].round(2)
+
+    top_recs_json = top_recs_w_reviews.to_json(orient='records')
     return top_recs_json
 
 
