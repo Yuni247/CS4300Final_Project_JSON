@@ -89,11 +89,18 @@ def books_search():
 
     def input_book_words(input_book, feature):
         words = {}
-        for word in tokenize(input_book[feature]):
-            if word in words:
-                words[word] += 1
-            else:
-                words[word] = 1
+        if feature == "descript":
+            for word in tokenize(input_book["descript"] + input_book["authors"]):
+                if word in words:
+                    words[word] += 1
+                else:
+                    words[word] = 1
+        elif feature == "categories":
+            for word in tokenize(input_book[feature]):
+                if word in words:
+                    words[word] += 1
+                else:
+                    words[word] = 1
         return words
     
     descript_inpbook_words, categories_inpbook_words = input_book_words(book_row, "descript"), input_book_words(book_row, "categories")
@@ -161,11 +168,11 @@ def books_search():
     # Local change only (change this after p03 deadline), Bone by Bone author feature was wrongly overtaken by categories + descript. 
     else:
         for title, score in authors_list:
-            combined_scores[title] = (score / avg_authors_score) * 6
+            combined_scores[title] = (score / avg_authors_score) * 4.5
         for title, score in descript_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) 
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) * 2
         for title, score in categories_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 3
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 3.5
     
     # Convert the dictionary to a sorted list of tuples
     combined_list = sorted(combined_scores.items(), key=lambda x: x[0], reverse=True)
