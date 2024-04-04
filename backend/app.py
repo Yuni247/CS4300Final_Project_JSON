@@ -83,7 +83,7 @@ def books_search():
     descript_idf = compute_idf(descript_idx, num_rows, min_df=5, max_df_ratio=0.95)
     categories_idf = compute_idf(categories_idx, num_rows, min_df=5, max_df_ratio=0.95)
 
-    # calculate doc norms for each feat
+    # calculate doc norms for each feature
     descript_d_norms = compute_doc_norms(descript_idx, descript_idf, num_rows)
     categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
 
