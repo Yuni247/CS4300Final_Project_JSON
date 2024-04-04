@@ -83,17 +83,24 @@ def books_search():
     descript_idf = compute_idf(descript_idx, num_rows, min_df=5, max_df_ratio=0.95)
     categories_idf = compute_idf(categories_idx, num_rows, min_df=5, max_df_ratio=0.95)
 
-    # calculate doc norms for each feat
+    # calculate doc norms for each feature
     descript_d_norms = compute_doc_norms(descript_idx, descript_idf, num_rows)
     categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
 
     def input_book_words(input_book, feature):
         words = {}
-        for word in tokenize(input_book[feature]):
-            if word in words:
-                words[word] += 1
-            else:
-                words[word] = 1
+        if feature == "descript":
+            for word in tokenize(input_book["descript"] + input_book["authors"]):
+                if word in words:
+                    words[word] += 1
+                else:
+                    words[word] = 1
+        elif feature == "categories":
+            for word in tokenize(input_book[feature]):
+                if word in words:
+                    words[word] += 1
+                else:
+                    words[word] = 1
         return words
     
     descript_inpbook_words, categories_inpbook_words = input_book_words(book_row, "descript"), input_book_words(book_row, "categories")
@@ -161,11 +168,11 @@ def books_search():
     # Local change only (change this after p03 deadline), Bone by Bone author feature was wrongly overtaken by categories + descript. 
     else:
         for title, score in authors_list:
-            combined_scores[title] = (score / avg_authors_score) * 6
+            combined_scores[title] = (score / avg_authors_score) * 4.5
         for title, score in descript_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) 
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) * 2
         for title, score in categories_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 3
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 3.5
     
     # Convert the dictionary to a sorted list of tuples
     combined_list = sorted(combined_scores.items(), key=lambda x: x[0], reverse=True)
