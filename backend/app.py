@@ -46,21 +46,6 @@ categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
 
 # FOR COSSIM: End of processing --------------------------------------------------------------------------
 
-
-
-
-# # Sample search using json with pandas
-# def get_books_titles():
-
-#     titles = []
-#     for bk in data:
-#         titles.append(bk["Title"])
-
-#     with open("books_titles", "w") as jsonf:
-#         jsonf.write(json.dumps(titles))
-
-#print(get_books_titles())
-
 @app.route("/suggest")
 def title_search():
     query = request.args.get("title")
