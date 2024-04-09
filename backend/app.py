@@ -44,7 +44,7 @@ categories_idf = compute_idf(categories_idx, num_rows, min_df=5, max_df_ratio=0.
 descript_d_norms = compute_doc_norms(descript_idx, descript_idf, num_rows)
 categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
 
-# FOR COSSIM: End of processing --------------------------------------------------------------------------
+# FOR COSSIM: End of processing -------------------------------------------------------------------------
 
 @app.route("/suggest")
 def title_search():
