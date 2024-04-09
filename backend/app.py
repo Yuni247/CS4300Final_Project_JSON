@@ -26,7 +26,7 @@ with open(json_file_path, 'r') as file:
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-# FOR COSSIM: Processing DB, creating inverted indexes here -------------------------------------------------
+# FOR COSSIM: Processing DB, creating inverted indexes here ------------------------------------------------
 
 # tokenized_books_feats --> list of dicts of tokenized ["authors"], ["descript"], ["categories"] strings (each book has a dict)
 tokenized_books_feats = process_books_df(books_df)
