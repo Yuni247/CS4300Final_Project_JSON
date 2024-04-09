@@ -26,7 +26,7 @@ with open(json_file_path, 'r') as file:
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-# FOR COSSIM: Processing DB, creating inverted indexes here
+# FOR COSSIM: Processing DB, creating inverted indexes here ---------------------------------------------
 
 # tokenized_books_feats --> list of dicts of tokenized ["authors"], ["descript"], ["categories"] strings (each book has a dict)
 tokenized_books_feats = process_books_df(books_df)
@@ -44,22 +44,7 @@ categories_idf = compute_idf(categories_idx, num_rows, min_df=5, max_df_ratio=0.
 descript_d_norms = compute_doc_norms(descript_idx, descript_idf, num_rows)
 categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
 
-# FOR COSSIM: End of pre-processing
-
-
-
-
-# # Sample search using json with pandas
-# def get_books_titles():
-
-#     titles = []
-#     for bk in data:
-#         titles.append(bk["Title"])
-
-#     with open("books_titles", "w") as jsonf:
-#         jsonf.write(json.dumps(titles))
-
-#print(get_books_titles())
+# FOR COSSIM: End of processing -------------------------------------------------------------------------
 
 @app.route("/suggest")
 def title_search():
@@ -139,11 +124,15 @@ def books_search():
         return output_list
     
     authors_list, descript_list, categories_list = id_to_titles(authors_list), id_to_titles(descript_list), id_to_titles(categories_list)
-    
+
     # Calculate average scores
-    avg_authors_score = sum(score for _, score in authors_list) / len(authors_list)
-    avg_descript_score = sum(score for _, score in descript_list) / len(descript_list)
-    avg_categories_score = sum(score for _, score in categories_list) / len(categories_list)
+    def avg_score(feature_list):
+        if len(feature_list) != 0:
+            return sum(score for _, score in feature_list) / len(feature_list)
+        else:
+            return 0
+
+    avg_authors_score, avg_descript_score, avg_categories_score = avg_score(authors_list), avg_score(descript_list), avg_score(categories_list)
 
     # creating final list based on common books between the three lists. Weights: authors > categories > descript
     combined_scores = {}
