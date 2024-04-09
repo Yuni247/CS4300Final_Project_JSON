@@ -26,6 +26,29 @@ with open(json_file_path, 'r') as file:
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
+# FOR COSSIM: Processing DB, creating inverted indexes here
+
+# tokenized_books_feats --> list of dicts of tokenized ["authors"], ["descript"], ["categories"] strings (each book has a dict)
+tokenized_books_feats = process_books_df(books_df)
+
+# Build inverted indexes for each feature
+descript_idx, categories_idx = build_inverted_indexes(tokenized_books_feats)
+
+num_rows = len(books_df)
+
+# Calculate idfs for each feature
+descript_idf = compute_idf(descript_idx, num_rows, min_df=5, max_df_ratio=0.95)
+categories_idf = compute_idf(categories_idx, num_rows, min_df=5, max_df_ratio=0.95)
+
+# calculate doc norms for each feature
+descript_d_norms = compute_doc_norms(descript_idx, descript_idf, num_rows)
+categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
+
+# FOR COSSIM: End of pre-processing
+
+
+
+
 # # Sample search using json with pandas
 # def get_books_titles():
 
@@ -71,21 +94,6 @@ def books_search():
 
     # Process the input book title to get the desired row in books_df
     book_row = books_df[books_df['Title'] == input_book_title].iloc[0]
-    tokenized_books_feats = process_books_df(books_df)
-    # tokenized_books_feats --> list of dicts of tokenized ["authors"], ["descript"], ["categories"] strings (each book has a dict)
-
-    # Build inverted indexes for each feature
-    descript_idx, categories_idx = build_inverted_indexes(tokenized_books_feats)
-
-    num_rows = len(books_df)
-
-    # Calculate idfs for each feature
-    descript_idf = compute_idf(descript_idx, num_rows, min_df=5, max_df_ratio=0.95)
-    categories_idf = compute_idf(categories_idx, num_rows, min_df=5, max_df_ratio=0.95)
-
-    # calculate doc norms for each feature
-    descript_d_norms = compute_doc_norms(descript_idx, descript_idf, num_rows)
-    categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
 
     def input_book_words(input_book, feature):
         words = {}
