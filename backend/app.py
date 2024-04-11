@@ -26,25 +26,26 @@ with open(json_file_path, 'r') as file:
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-# FOR COSSIM: Processing DB, creating inverted indexes here ---------------------------------------------
+# -------------------FOR COSSIM: Processing DB, creating inverted indexes here ---------------------------------------------
 
 # tokenized_books_feats --> list of dicts of tokenized ["authors"], ["descript"], ["categories"] strings (each book has a dict)
 tokenized_books_feats = process_books_df(books_df)
 
 # Build inverted indexes for each feature
-descript_idx, categories_idx = build_inverted_indexes(tokenized_books_feats)
+descript_idx = build_inverted_indexes(tokenized_books_feats)
+# , categories_idx
 
 num_rows = len(books_df)
 
 # Calculate idfs for each feature
 descript_idf = compute_idf(descript_idx, num_rows, min_df=5, max_df_ratio=0.95)
-categories_idf = compute_idf(categories_idx, num_rows, min_df=5, max_df_ratio=0.95)
+# categories_idf = compute_idf(categories_idx, num_rows, min_df=5, max_df_ratio=0.95)
 
 # calculate doc norms for each feature
 descript_d_norms = compute_doc_norms(descript_idx, descript_idf, num_rows)
-categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
+# categories_d_norms = compute_doc_norms(categories_idx, categories_idf, num_rows)
 
-# FOR COSSIM: End of processing -------------------------------------------------------------------------
+# -------------------FOR COSSIM: End of processing -------------------------------------------------------------------------
 
 @app.route("/suggest")
 def title_search():
@@ -80,41 +81,53 @@ def books_search():
     # Process the input book title to get the desired row in books_df
     book_row = books_df[books_df['Title'] == input_book_title].iloc[0]
 
-    def input_book_words(input_book, feature):
+    def input_book_words(input_book):
+        # , feature
         words = {}
-        if feature == "descript":
-            for word in tokenize(input_book["descript"] + input_book["authors"]):
-                if word in words:
-                    words[word] += 1
-                else:
-                    words[word] = 1
-        elif feature == "categories":
+        #if feature == "descript":
+        for word in (tokenize(input_book["descript"]) + tokenize_authors(input_book["authors"])):
+            if word in words:
+                words[word] += 1
+            else:
+                words[word] = 1
+        """elif feature == "categories":
             for word in tokenize(input_book[feature]):
                 if word in words:
                     words[word] += 1
                 else:
-                    words[word] = 1
+                    words[word] = 1"""
         return words
     
-    descript_inpbook_words, categories_inpbook_words = input_book_words(book_row, "descript"), input_book_words(book_row, "categories")
-
+    descript_inpbook_words = input_book_words(book_row)
+    # , categories_inpbook_words, input_book_words(book_row, "categories")
     descript_scores = accumulate_dot_scores(descript_inpbook_words, descript_idx, descript_idf)
-    categories_scores = accumulate_dot_scores(categories_inpbook_words, categories_idx, categories_idf)
+    # categories_scores = accumulate_dot_scores(categories_inpbook_words, categories_idx, categories_idf)
 
-    # Use Jaccard Similarity for authors (each author token is a single author, inside a list of toks for each book)
+    # Use Jaccard Similarity for authors and categories (each author token is a single author, inside a list of toks for each book)
     authors_scores = []
-    for id, book in enumerate(tokenized_books_feats):
-        tok_df_authors = book["authors"]
-        tok_inp_authors = tokenize_authors(book_row["authors"])
-        intersection = list(set(tok_df_authors) & set(tok_inp_authors))
-        union = list(set(tok_df_authors) | set(tok_inp_authors))
-        score = len(intersection) / len(union)
-        authors_scores.append((score, id))
+    categories_scores = []
+
+    def jaccard_scores(feature, score_list):
+        for id, book in enumerate(tokenized_books_feats):
+            tok_df_feats = book[feature]
+            if feature == "authors":
+                tok_inp_feats = tokenize_authors(book_row[feature])
+            else:
+                tok_inp_feats = tokenize(book_row[feature])
+            intersection = list(set(tok_df_feats) & set(tok_inp_feats))
+            union = list(set(tok_df_feats) | set(tok_inp_feats))
+            score = len(intersection) / len(union)
+            score_list.append((score, id))
+    
+    jaccard_scores("authors", authors_scores)
+    jaccard_scores("categories", categories_scores)
+
 
     # Top 30 results for each cossim comparison (authors, descript, and categories)
     authors_list = sorted(authors_scores, key=lambda x: x[0], reverse=True)[0:30]
     descript_list = index_search(descript_inpbook_words, descript_scores, descript_idf, descript_d_norms)[0:30]
-    categories_list = index_search(categories_inpbook_words, categories_scores, categories_idf, categories_d_norms)[0:30]
+    categories_list = sorted(categories_scores, key=lambda x: x[0], reverse=True)[0:30]
+    # categories_list = index_search(categories_inpbook_words, categories_scores, categories_idf, categories_d_norms)[0:30]
 
     def id_to_titles(input_list):
         output_list = []
@@ -137,39 +150,27 @@ def books_search():
     # creating final list based on common books between the three lists. Weights: authors > categories > descript
     combined_scores = {}
 
-    # normal weights: (author, descript, categories: 0.6, 0.1, 0.3)
+    def avg_weighter(author_weight, descript_weight, categories_weight):
+        for title, score in authors_list:
+            combined_scores[title] = (score / avg_authors_score) * author_weight
+        for title, score in descript_list:
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) * descript_weight
+        for title, score in categories_list:
+            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * categories_weight
+    
     # weight if authors = "null": (author, descript, categories: 0.0, 0.3, 0.7)
     if book_row["authors"] == "null" and book_row["descript"] != "null":
-        for title, score in authors_list:
-            combined_scores[title] = 0
-        for title, score in descript_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) * 3
-        for title, score in categories_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 7
+        avg_weighter(0, 3, 7)
     # weight if descript = "null": (author, descript, categories: 0.55, 0.0, 0.45)
     elif book_row["descript"] == "null" and book_row["authors"] != "null":
-        for title, score in authors_list:
-            combined_scores[title] = (score / avg_authors_score) * 5.5
-        for title, score in descript_list:
-            combined_scores[title] = 0
-        for title, score in categories_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 4.5
+        avg_weighter(5.5, 0, 4.5)
     # weight if both authors and descript = "null": (author, descript, categories: 0.0, 0.0, 1.0)
     elif book_row["descript"] == "null" and book_row["descript"] == "null":
-        for title, score in authors_list:
-            combined_scores[title] = 0
-        for title, score in descript_list:
-            combined_scores[title] = 0
-        for title, score in categories_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 10
-    # Local change only (change this after p03 deadline), Bone by Bone author feature was wrongly overtaken by categories + descript. 
+        avg_weighter(0, 0, 10)
+    # normal weights: (author, descript, categories: 0.45, 0.2, 0.35)
     else:
-        for title, score in authors_list:
-            combined_scores[title] = (score / avg_authors_score) * 4.5
-        for title, score in descript_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_descript_score) * 2
-        for title, score in categories_list:
-            combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * 3.5
+        avg_weighter(4.5, 2, 3.5)
+
     
     # Convert the dictionary to a sorted list of tuples
     combined_list = sorted(combined_scores.items(), key=lambda x: x[0], reverse=True)

@@ -86,13 +86,12 @@ def build_idx_helper(idx_dict, tokenized_books_feats, feature):
 def build_inverted_indexes(tokenized_db_feats):
     print("STARTED BUILDING INV INDEXES")
     descript_idx = {}
-    categories_idx = {}
     # go thru each book (dict) in the list
     # output 2 inverted indexes (one for each feat)
     descript_idx = build_idx_helper(descript_idx, tokenized_db_feats, "descript")
-    categories_idx = build_idx_helper(categories_idx, tokenized_db_feats, "categories")
+    # categories_idx = build_idx_helper(categories_idx, tokenized_db_feats, "categories")
     print("FINISHED BUILDING INV INDEXES")
-    return descript_idx, categories_idx
+    return descript_idx# , categories_idx
 
 
 def compute_idf(inv_idx, n_docs, min_df=5, max_df_ratio=0.95):
