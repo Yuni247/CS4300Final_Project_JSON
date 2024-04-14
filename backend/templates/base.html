@@ -10,9 +10,10 @@
         rel="stylesheet">
 
     <style>
-        body,
-        html {
+        html,
+        body {
             height: 100%;
+
         }
 
         .introduction-page {
@@ -24,7 +25,7 @@
         }
 
         .introduction-text {
-            max-width: 600px;
+            width: 600px;
             padding: 20px;
             background-color: rgba(255, 255, 255, 0.3);
             border-radius: 10px;
@@ -33,15 +34,26 @@
             box-shadow: 0 18px 30px 40px rgba(0, 0, 0, 0.3);
             font-weight: bold;
             font-size: 28px;
-            /* text outlines */
             text-shadow:
                 -1.5px -1.5px 2px #000,
                 1.5px -1.5px 2px #000,
                 -1.5px 1.5px 2px #000,
                 1.5px 1.5px 2px #000;
+            gap: 10px;
         }
 
-        .full-body-container {
+        .introduction-text p {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .full-body-container,
+        .full-body-container-2 {
             display: none;
             height: auto;
             width: 100%;
@@ -55,11 +67,20 @@
             <!-- TODO: Make a better description -->
             <p>Welcome to our Book Hub! Here you can get a personalized list of book recommendations from this virtual
                 bookstore to build your own personal library. Hope you enjoy!</p>
-            <button onclick="showSearch()">Press to Continue</button>
+            <div class="button-group">
+                <p>To search books based on your favorite book, click below:</p>
+                <button onclick="showSearch('full-body-container')">Click to Continue</button>
+            </div>
+            <div class="button-group">
+                <p>To search books by mood/interest, click below:</p>
+                <button onclick="showSearch('full-body-container-2')">Click to Continue</button>
+            </div>
         </div>
 
     </div>
+    <!-- This is for the search page based on favorite book -->
     <div class="full-body-container" style="display: none;">
+        <button onclick="showIntroduction()">Go back to main page</button>
         <div class="top-text">
             <div class="google-colors">
                 <h1 id="google-4">B</h1>
@@ -92,12 +113,56 @@
         </div>
     </div>
 
+    <!-- This is for the SVD search page -->
+    <div class="full-body-container-2" style="display: none;">
+        <button onclick="showIntroduction()">Go back to main page</button>
+        <div class="top-text">
+            <div class="google-colors">
+                <h1 id="google-4">B</h1>
+                <h1 id="google-3">O</h1>
+                <h1 id="google-0-1">O</h1>
+                <h1 id="google-0-2">K</h1>
+                <h1 id="google-4">H</h1>
+                <h1 id="google-3">U</h1>
+                <h1 id="google-0-1">B</h1>
+                <h1 id="google-0-2">2</h1>
+
+            </div>
+            <div class="input-box">
+                <img src="/static/images/mag.png" />
+                <i class="fas fa-search"></i>
+                <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
+                <div class="wrapper">
+                    <div class="search-input">
+                        <a href="" target="_blank" hidden></a>
+                        <input id="" type="text" placeholder="Search for your next read..." />
+                        <div class="autocom-box">
+                            <!-- here list is inserted from JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="answer-box">
+
+        </div>
+    </div>
+
     <script src="../static/books_titles.js"></script>
     <script>
         // Help switch from intro page to the search page
-        function showSearch() {
+        function showSearch(containerClass) {
             document.querySelector('.introduction-page').style.display = 'none';
-            document.querySelector('.full-body-container').style.display = 'block';
+            document.querySelector('.full-body-container').style.display = 'none';
+            document.querySelector('.full-body-container-2').style.display = 'none';
+            document.querySelector('.' + containerClass).style.display = 'block';
+        }
+        //lets user go back to the intro/main page
+        function showIntroduction() {
+            document.querySelector('.introduction-page').style.display = 'block';
+            document.querySelector('.full-body-container').style.display = 'none';
+            document.querySelector('.full-body-container-2').style.display = 'none';
         }
         const searchWrapper = document.querySelector('.search-input');
         const inputBox = searchWrapper.querySelector('input');
