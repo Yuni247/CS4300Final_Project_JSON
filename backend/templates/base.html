@@ -1,13 +1,86 @@
-<!doctype html>
-<title>{% block title %}{% endblock %} - Flaskr</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kanit&family=Montserrat&family=Open+Sans:wght@500&display=swap"
-    rel="stylesheet">
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> - Flaskr</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&family=Montserrat&family=Open+Sans:wght@500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        html,
+        body {
+            height: 100%;
+
+        }
+
+        .introduction-page {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            background: url("/static/images/bookshop.png") no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .introduction-text {
+            width: 600px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 18px 30px 40px rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+            font-size: 28px;
+            text-shadow:
+                -1.5px -1.5px 2px #000,
+                1.5px -1.5px 2px #000,
+                -1.5px 1.5px 2px #000,
+                1.5px 1.5px 2px #000;
+            gap: 10px;
+        }
+
+        .introduction-text p {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .full-body-container,
+        .full-body-container-2 {
+            display: none;
+            height: auto;
+            width: 100%;
+        }
+    </style>
+</head>
 
 <body>
-    <div class="full-body-container">
+    <div class="introduction-page" style="display: block;">
+        <div class="introduction-text">
+            <!-- TODO: Make a better description -->
+            <p>Welcome to our Book Hub! Here you can get a personalized list of book recommendations from this virtual
+                bookstore to build your own personal library. Hope you enjoy!</p>
+            <div class="button-group">
+                <p>To search books based on your favorite book, click below:</p>
+                <button onclick="showSearch('full-body-container')">Click to Continue</button>
+            </div>
+            <div class="button-group">
+                <p>To search books by mood/interest, click below:</p>
+                <button onclick="showSearch('full-body-container-2')">Click to Continue</button>
+            </div>
+        </div>
+
+    </div>
+    <!-- This is for the search page based on favorite book -->
+    <div class="full-body-container" style="display: none;">
+        <button onclick="showIntroduction()">Go back to main page</button>
         <div class="top-text">
             <div class="google-colors">
                 <h1 id="google-4">B</h1>
@@ -19,20 +92,56 @@
                 <h1 id="google-0-1">B</h1>
 
             </div>
-            <div class="input-box" >
-                <img src="{{ url_for('static', filename='images/mag.png') }}" />
+            <div class="input-box">
+                <img src="/static/images/mag.png" />
                 <i class="fas fa-search"></i>
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
                 <div class="wrapper">
-                  <div class="search-input">
-                    <a href="" target="_blank" hidden></a>
-                    <input id="" type="text" placeholder="Search for your next read..."  />
-                    <div class="autocom-box">
-                      <!-- here list is inserted from JavaScript -->
+                    <div class="search-input">
+                        <a href="" target="_blank" hidden></a>
+                        <input id="" type="text" placeholder="Search for your next read..." />
+                        <div class="autocom-box">
+                            <!-- here list is inserted from JavaScript -->
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
+            </div>
+        </div>
+
+        <div id="answer-box">
+
+        </div>
+    </div>
+
+    <!-- This is for the SVD search page -->
+    <div class="full-body-container-2" style="display: none;">
+        <button onclick="showIntroduction()">Go back to main page</button>
+        <div class="top-text">
+            <div class="google-colors">
+                <h1 id="google-4">B</h1>
+                <h1 id="google-3">O</h1>
+                <h1 id="google-0-1">O</h1>
+                <h1 id="google-0-2">K</h1>
+                <h1 id="google-4">H</h1>
+                <h1 id="google-3">U</h1>
+                <h1 id="google-0-1">B</h1>
+                <h1 id="google-0-2">2</h1>
+
+            </div>
+            <div class="input-box">
+                <img src="/static/images/mag.png" />
+                <i class="fas fa-search"></i>
+                <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
+                <div class="wrapper">
+                    <div class="search-input">
+                        <a href="" target="_blank" hidden></a>
+                        <input id="" type="text" placeholder="Search for your next read..." />
+                        <div class="autocom-box">
+                            <!-- here list is inserted from JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="answer-box">
@@ -41,82 +150,93 @@
     </div>
 
     <script src="../static/books_titles.js"></script>
-    <script> 
+    <script>
+        // Help switch from intro page to the search page
+        function showSearch(containerClass) {
+            document.querySelector('.introduction-page').style.display = 'none';
+            document.querySelector('.full-body-container').style.display = 'none';
+            document.querySelector('.full-body-container-2').style.display = 'none';
+            document.querySelector('.' + containerClass).style.display = 'block';
+        }
+        //lets user go back to the intro/main page
+        function showIntroduction() {
+            document.querySelector('.introduction-page').style.display = 'block';
+            document.querySelector('.full-body-container').style.display = 'none';
+            document.querySelector('.full-body-container-2').style.display = 'none';
+        }
         const searchWrapper = document.querySelector('.search-input');
-        //console.log(searchWrapper);
         const inputBox = searchWrapper.querySelector('input');
         const suggBox = searchWrapper.querySelector('.autocom-box');
         const icon = document.getElementsByClassName('fa-search');
-        
-        //console.log("Here" , icon)
+
 
         let webLink;
 
         document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            searchWrapper.classList.remove('active');
-            query();
-            document.activeElement.blur();
-            return;
-        }
+            if (e.key === 'Enter') {
+                searchWrapper.classList.remove('active');
+                query();
+                document.activeElement.blur();
+                return;
+            }
         });
 
         // search icon onclick
         icon.onclick = () => {
-        searchWrapper.classList.remove('active');
-        query();
-        return;
+            searchWrapper.classList.remove('active');
+            query();
+            return;
         };
 
         // if user presses any key and releases
         inputBox.onkeyup = (e) => {
-        let userData = e.target.value; // user entered data
+            let userData = e.target.value; // user entered data
 
-        let emptyArray = [];
-        if (userData) {
-            emptyArray = titles.filter((data) => {
-            // filtering array value and user characters to lowercase and return only those words which start with the user entered characters
-            return data.toLowerCase().startsWith(userData.toLowerCase());
-            });
-            emptyArray = emptyArray.map((data) => {
-            // passing return data inside li tag
-            return `<li>${data}</li>`;
-            });
-            searchWrapper.classList.add('active'); // show autocomplete box
-            showSuggestions(emptyArray);
-            let allList = suggBox.querySelectorAll('li');
-            for (let i = 0; i < allList.length; i++) {
-            // adding onclick attribute in all li tags
-            allList[i].setAttribute('onclick', 'select(this)');
+            let emptyArray = [];
+            if (userData) {
+                emptyArray = titles.filter((data) => {
+                    // filtering array value and user characters to lowercase and return only those words which start with the user entered characters
+                    return data.toLowerCase().startsWith(userData.toLowerCase());
+                });
+                emptyArray = emptyArray.map((data) => {
+                    // passing return data inside li tag
+                    return `<li>${data}</li>`;
+                });
+                searchWrapper.classList.add('active'); // show autocomplete box
+                showSuggestions(emptyArray);
+                let allList = suggBox.querySelectorAll('li');
+                for (let i = 0; i < allList.length; i++) {
+                    // adding onclick attribute in all li tags
+                    allList[i].setAttribute('onclick', 'select(this)');
+                }
+            } else {
+                searchWrapper.classList.remove('active'); // hide autocomplete box
             }
-        } else {
-            searchWrapper.classList.remove('active'); // hide autocomplete box
-        }
         };
-  
+
         function select(element) {
             //console.log(element.textContent)
-        let selectData = element.textContent;
-        inputBox.value = selectData;
-        query()
-        searchWrapper.classList.remove('active');
-        inputBox.focus();
+            let selectData = element.textContent;
+            inputBox.value = selectData;
+            query()
+            searchWrapper.classList.remove('active');
+            inputBox.focus();
         }
 
         function showSuggestions(list) {
-        
-        let listData;
-        if (!list.length) {
-            userValue = inputBox.value;
-            listData = `<li>${userValue}</li>`;
-        } else {
-            listData = list.join('');
-        }
-        suggBox.innerHTML = listData;
+
+            let listData;
+            if (!list.length) {
+                userValue = inputBox.value;
+                listData = `<li>${userValue}</li>`;
+            } else {
+                listData = list.join('');
+            }
+            suggBox.innerHTML = listData;
         }
 
         inputBox.addEventListener('focusout', (e) =>
-        setTimeout(() => searchWrapper.classList.remove('active'), 200)
+            setTimeout(() => searchWrapper.classList.remove('active'), 200)
         );
 
         function answerBoxTemplate(title, authors, categories, description, score) {
@@ -160,7 +280,8 @@
                         });
                     });
             }
-            };
+        };
     </script>
 </body>
+
 </html>
