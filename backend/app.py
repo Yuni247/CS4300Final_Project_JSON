@@ -79,9 +79,10 @@ def books_search():
     input_book_title = request.args.get("title")  # Get the book title from query parameters
 
     # Process the input book title to get the desired row in books_df
+    print(books_df[books_df['Title'] == input_book_title])
     book_row = books_df[books_df['Title'] == input_book_title].iloc[0]
 
-    def input_book_words(input_book):
+    def input_book_words(input_book): 
         # , feature
         words = {}
         #if feature == "descript":
