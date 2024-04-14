@@ -16,9 +16,9 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
 # Specify the path to the JSON file relative to the current script
-json_file_path = os.path.join(current_directory, 'books_merged.json')
+json_file_path = os.path.join(current_directory, 'init.json')
 
-# Assuming your JSON data is stored in a file named 'books_merged.json'
+# Assuming your JSON data is stored in a file named 'init.json'
 with open(json_file_path, 'r') as file:
     data = json.load(file)
     books_df = pd.DataFrame(data)
