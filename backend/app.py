@@ -49,7 +49,7 @@ descript_d_norms = compute_doc_norms(descript_idx, descript_idf, num_rows)
 
 # -------------------FOR COSSIM: End of processing -------------------------------------------------------------------------
 
-@app.route("/book")
+
 def title_search():
     query = request.args.get("title")
     if query != None:
@@ -76,7 +76,7 @@ def home():
 
 
 #input- input_book: row in books_df that was matched with the user's query input
-@app.route("/mood")
+@app.route("/books")
 def books_search():
     input_book_title = request.args.get("title")  # Get the book title from query parameters
 
@@ -215,11 +215,13 @@ def preference_search():
 
     if unique_dicts:
         recommended_book = random.choice(unique_dicts)
-        return recommended_book
+        rec_json = json.dumps([recommended_book])
+        return rec_json
     else:
         random_category = random.choice(unique_categories)
         random_book = random.choice(category_to_book[random_category])
-        return random_book
+        rec_json = json.dumps([random_book])
+        return rec_json
 
 if 'DB_NAME' not in os.environ:
     app.run(debug=True, host="0.0.0.0", port=5217)
