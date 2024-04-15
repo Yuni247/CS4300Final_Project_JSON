@@ -7,6 +7,8 @@ import pandas as pd
 import Levenshtein as lev
 from cossim import * 
 from cossim import build_inverted_indexes
+from svd_computation import *
+import random
 
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
@@ -79,7 +81,7 @@ def books_search():
     input_book_title = request.args.get("title")  # Get the book title from query parameters
 
     # Process the input book title to get the desired row in books_df
-    print(books_df[books_df['Title'] == input_book_title])
+    #print(books_df[books_df['Title'] == input_book_title])
     book_row = books_df[books_df['Title'] == input_book_title].iloc[0]
 
     def input_book_words(input_book): 
@@ -196,6 +198,26 @@ def books_search():
     top_recs_json = top_recs_w_reviews.to_json(orient='records')
     return top_recs_json
 
+def preference_search():
+    mood_interest = request.args.get("title")  # Get the book title from query parameters
+    filtered_books = []
+    for _, sim_category, _ in closest_projects_to_word(mood_interest):
+        filtered_books.extend(category_to_book[sim_category])
+    if len(filtered_books) > 2:
+        # Convert each dictionary to a tuple of its items
+        tuple_list = [tuple(d.items()) for d in filtered_books]
+        # Use set to remove duplicates
+        unique_tuples = set(tuple_list)
+        # Convert the unique tuples back to dictionaries
+        unique_dicts = [dict(t) for t in unique_tuples]
+
+    if unique_dicts:
+        recommended_book = random.choice(unique_dicts)
+        return recommended_book
+    else:
+        random_category = random.choice(unique_categories)
+        random_book = random.choice(category_to_book[random_category])
+        return random_book
 
 if 'DB_NAME' not in os.environ:
     app.run(debug=True, host="0.0.0.0", port=5217)
