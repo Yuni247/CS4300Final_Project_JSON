@@ -13,13 +13,20 @@
         html,
         body {
             height: 100%;
-
         }
 
         .introduction-page {
             height: 100vh;
             width: 100%;
             display: flex;
+            flex-direction: column;
+            /* Stack children vertically */
+            justify-content: center;
+            /* Center vertically */
+            align-items: center;
+            /* Center horizontally */
+            text-align: center;
+            /* Center text within children */
             background: url("/static/images/bookshop.png") no-repeat center center fixed;
             background-size: cover;
         }
@@ -30,6 +37,7 @@
             background-color: rgba(255, 255, 255, 0.3);
             border-radius: 10px;
             text-align: center;
+            transform: translateX(+45%);
             color: white;
             box-shadow: 0 18px 30px 40px rgba(0, 0, 0, 0.3);
             font-weight: bold;
@@ -57,6 +65,18 @@
             display: none;
             height: auto;
             width: 100%;
+            justify-content: center;
+        }
+
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            text-align: center;
+            /* Centers text in these elements */
         }
     </style>
 </head>
@@ -65,7 +85,8 @@
     <div class="introduction-page" style="display: block;">
         <div class="introduction-text">
             <!-- TODO: Make a better description -->
-            <p>Welcome to our Book Hub! Here you can get a personalized list of book recommendations from this virtual
+            <p>Welcome to our Book Hub! <br>Here you can get a personalized list of book recommendations from this
+                virtual
                 bookstore to build your own personal library. Hope you enjoy!</p>
             <div class="button-group">
                 <p>To search books based on your favorite book, click below:</p>
@@ -76,7 +97,24 @@
                 <button onclick="showSearch('full-body-container-2')">Click to Continue</button>
             </div>
         </div>
+        <!-- Adding more info about our app -->
+        <h1><br><br><br><br><br><br><br>Our Database</h1>
+        <p>Our data is based off of books sold on Amazon. The data includes the book titles, descriptions, authors,
+            publishers, categories, review scores, and review counts.</p>
+        <h1>Ranking Process</h1>
+        <h3>When Inputting a Book:</h3>
+        <p>The authors and categories of the books are matched with the selected book by Jaccard Similarity, while the
+            descriptions are matched by Cossine Similarity. <br>The review scores and review counts are used to further
+            fine-tune our rankings, with the differences in review counts becoming less important as the count increases
+            (i.e. 5 vs 50 reviews is a more important difference than 1000 vs 1100 reviews). </p>
+        <h3>When Inputting a Theme:</h3>
+        <p>TBA :D<br><br></p>
 
+        <div class="introduction-page" style="display: block;">
+            <div class="introduction-text">
+                <p>Thank you for visiting our Book Hub. We hope you find something great to read!</p>
+            </div>
+        </div>
     </div>
     <!-- This is for the search page based on favorite book -->
     <div class="full-body-container" style="display: none;">
@@ -282,6 +320,7 @@
             }
         };
     </script>
+
 </body>
 
 </html>
