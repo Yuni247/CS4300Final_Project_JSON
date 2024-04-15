@@ -4,11 +4,9 @@ import os
 import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import CountVectorizer
 import random
 from scipy.sparse.linalg import svds
 from sklearn.preprocessing import normalize
-from operator import itemgetter
 
 os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 
@@ -5264,16 +5262,9 @@ category_to_book = {}
 for category in unique_categories:
   category_to_book[category] = []
 for book in data:
-  book_cat = book["categories"]
-  # Remove the brackets from the string
-  book_cat = book_cat[1:-1]
-  # Split the string into individual items
-  items = book_cat.split(", ")
-  for category in items:
-    if category in category_to_book:
-      category_to_book[category].append(book)
-    else:
-      category_to_book[category] = [book]
+  book_cat = json.loads(book["categories"])
+  for category in book_cat:
+    category_to_book[category].append(book)
 
 ### ------ Starting SVD computations ------- ###
 # do SVD with a very large k (we usually use 100), just for the sake of getting many sorted singular values (aka importances)
@@ -5334,4 +5325,3 @@ def recommend_book(mood_interest):
     random_category = random.choice(unique_categories)
     random_book = random.choice(category_to_book[random_category])
     return random_book
-
