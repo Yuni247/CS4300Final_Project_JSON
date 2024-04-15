@@ -1,5 +1,6 @@
 from __future__ import print_function
 import numpy as np
+import os
 import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -9,9 +10,17 @@ from scipy.sparse.linalg import svds
 from sklearn.preprocessing import normalize
 from operator import itemgetter
 
-file_path = 'backend/init.json'
-with open(file_path, 'r') as f:
-    data = json.load(f)
+os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
+
+# Get the directory of the current script
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+# Specify the path to the JSON file relative to the current script
+json_file_path = os.path.join(current_directory, 'init.json')
+
+# Assuming your JSON data is stored in a file named 'init.json'
+with open(json_file_path, 'r') as file:
+    data = json.load(file)
 
 unique_categories = ['Joyful Journeys',
  'Heartwarming Tales',
@@ -5255,9 +5264,16 @@ category_to_book = {}
 for category in unique_categories:
   category_to_book[category] = []
 for book in data:
-  book_cat = json.loads(book["categories"])
-  for category in book_cat:
-    category_to_book[category].append(book)
+  book_cat = book["categories"]
+  # Remove the brackets from the string
+  book_cat = book_cat[1:-1]
+  # Split the string into individual items
+  items = book_cat.split(", ")
+  for category in items:
+    if category in category_to_book:
+      category_to_book[category].append(book)
+    else:
+      category_to_book[category] = [book]
 
 ### ------ Starting SVD computations ------- ###
 # do SVD with a very large k (we usually use 100), just for the sake of getting many sorted singular values (aka importances)
