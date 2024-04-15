@@ -205,7 +205,8 @@ def preference_search():
     filtered_books = []
     for _, sim_category, _ in closest_projects_to_word(mood_interest):
         filtered_books.extend(category_to_book[sim_category])
-    if len(filtered_books) > 2:
+    unique_dicts = []
+    if len(filtered_books):
         # Convert each dictionary to a tuple of its items
         tuple_list = [tuple(d.items()) for d in filtered_books]
         # Use set to remove duplicates
@@ -213,13 +214,11 @@ def preference_search():
         # Convert the unique tuples back to dictionaries
         unique_dicts = [dict(t) for t in unique_tuples]
 
-    if unique_dicts:
         recommended_book = random.choice(unique_dicts)
         rec_json = json.dumps([recommended_book])
         return rec_json
     else:
-        random_category = random.choice(unique_categories)
-        random_book = random.choice(category_to_book[random_category])
+        random_book = random.choice(data)
         rec_json = json.dumps([random_book])
         return rec_json
 

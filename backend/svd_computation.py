@@ -5262,9 +5262,16 @@ category_to_book = {}
 for category in unique_categories:
   category_to_book[category] = []
 for book in data:
-  book_cat = json.loads(book["categories"])
-  for category in book_cat:
-    category_to_book[category].append(book)
+  book_cat = book["categories"]
+  # Remove the brackets from the string
+  book_cat = book_cat[1:-1]
+  # Split the string into individual items
+  items = book_cat.split(", ")
+  for category in items:
+    if category in category_to_book:
+      category_to_book[category].append(book)
+    else:
+      category_to_book[category] = [book]
 
 ### ------ Starting SVD computations ------- ###
 # do SVD with a very large k (we usually use 100), just for the sake of getting many sorted singular values (aka importances)
