@@ -201,7 +201,7 @@ def books_search():
 
 @app.route("/mood")
 def preference_search():
-    mood_interest = request.args.get("title")  # Get the book title from query parameters
+    mood_interest = request.args.get("mood")  # Get the mood from query parameters
     filtered_books = []
     for _, sim_category, _ in closest_projects_to_word(mood_interest):
         filtered_books.extend(category_to_book[sim_category])

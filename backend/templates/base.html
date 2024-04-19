@@ -20,13 +20,9 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            /* Stack children vertically */
             justify-content: center;
-            /* Center vertically */
             align-items: center;
-            /* Center horizontally */
             text-align: center;
-            /* Center text within children */
             background: url("/static/images/bookshop.png") no-repeat center center fixed;
             background-size: cover;
         }
@@ -76,7 +72,6 @@
         h5,
         h6 {
             text-align: center;
-            /* Centers text in these elements */
         }
     </style>
 </head>
@@ -84,7 +79,6 @@
 <body>
     <div class="introduction-page" style="display: block;">
         <div class="introduction-text">
-            <!-- TODO: Make a better description -->
             <p>Welcome to our Book Hub! <br>Here you can get a personalized list of book recommendations from this
                 virtual
                 bookstore to build your own personal library. Hope you enjoy!</p>
@@ -97,7 +91,6 @@
                 <button onclick="showSearch('full-body-container-2')">Click to Continue</button>
             </div>
         </div>
-        <!-- Adding more info about our app -->
         <h1><br><br><br><br><br><br><br>Our Database</h1>
         <p>Our data is based off of books sold on Amazon. The data includes the book titles, descriptions, authors,
             publishers, categories, review scores, and review counts.</p>
@@ -108,6 +101,7 @@
             fine-tune our rankings, with the differences in review counts becoming less important as the count increases
             (i.e. 5 vs 50 reviews is a more important difference than 1000 vs 1100 reviews). </p>
         <h3>When Inputting a Theme:</h3>
+        <!-- TODO -->
         <p>TBA :D<br><br></p>
 
         <div class="introduction-page" style="display: block;">
@@ -171,24 +165,55 @@
                 <i class="fas fa-search"></i>
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
                 <div class="wrapper">
-                    <div class="search-input">
-                        <a href="" target="_blank" hidden></a>
-                        <input id="" type="text" placeholder="Search for your next read..." />
-                        <div class="autocom-box">
-                            <!-- here list is inserted from JavaScript -->
-                        </div>
+                    <div class="input-box" onclick="sendFocus2()">
+                        <img src="{{ url_for('static', filename='images/mag.png') }}" />
+                        <input placeholder="Search by mood or interest" id="mood-input" onkeyup="showMood()">
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="answer-box">
+        <div id="answer-box-2">
 
         </div>
     </div>
 
     <script src="../static/books_titles.js"></script>
     <script>
+
+function answerBox2(title, authors, description, score) {
+    return `
+        <div class='recommendation-container'>
+            <h3 class='book-title'>${title}</h3>
+            <p class='book-authors'>${authors}</p>
+            <p class='book-description'>${description}</p>
+            <p class='book-review-score'>Review Score: ${score}</p>
+        </div>`;
+}
+
+function sendFocus2() {
+    document.getElementById('mood-input').focus();
+}
+
+function showMood() {
+    const input = document.getElementById('mood-input').value; 
+    const answerBox = document.getElementById('answer-box-2');     
+    answerBox.innerHTML = '';  
+
+    if (input.trim() !== '') {
+        fetch("/mood?" + new URLSearchParams({ mood: input }))
+            .then(response => response.json())
+            .then(data => {
+                // Display each book received from the server
+                data.forEach(book => {
+                    const bookDivClass = document.createElement('div');
+                    bookDivClass.innerHTML = answerBox2(book.Title, book.authors, book.descript, book.review_score);
+                    answerBox.appendChild(bookDivClass);
+                });
+            })
+    }
+}
+
         // Help switch from intro page to the search page
         function showSearch(containerClass) {
             document.querySelector('.introduction-page').style.display = 'none';
@@ -253,7 +278,6 @@
         };
 
         function select(element) {
-            //console.log(element.textContent)
             let selectData = element.textContent;
             inputBox.value = selectData;
             query()
@@ -294,22 +318,18 @@
 
         function query() {
             searchWrapper.classList.remove('active');
-            //console.log('Querying...');
 
             let searchParams = new URLSearchParams();
             searchParams.append('title', inputBox.value);
 
-            // let searchText = document.getElementsByClassName("search-input").value.trim();
             let searchText = inputBox.value.trim();
             suggBox.innerHTML = "";
 
-            //console.log(searchText)
             if (searchText !== "") {
                 fetch("/books?" + new URLSearchParams({ title: searchText }).toString())
                     .then((response) => response.json())
                     .then((data) => {
                         let output_div = document.getElementById("answer-box")
-                        //console.log(data)
                         document.getElementById("answer-box").innerHTML = "";
                         data.slice(0, 10).forEach(row => {
                             let tempDiv = document.createElement("div");
