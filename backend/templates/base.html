@@ -58,10 +58,13 @@
 
         .full-body-container,
         .full-body-container-2 {
-            display: none;
+            display: flex;
             height: auto;
             width: 100%;
             justify-content: center;
+            max-width: 100%;
+            flex-direction: column;
+            align-items: center;
         }
 
         p,
@@ -73,6 +76,42 @@
         h6 {
             text-align: center;
         }
+
+
+        .input-box {
+            border-radius: 50px;
+            border: 1px solid black;
+            display: flex;
+            align-items: center;
+            margin: 10px auto;
+            padding: 10px;
+            position: relative; 
+            width: 600px; 
+        }
+
+        .input-box img {
+            position: absolute;
+            left: 3px; 
+            top: 50%; 
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .book-title {
+            color: #0ed988;
+            font-weight: bold;
+        }
+        
+        .book-description {
+            color: #091241;
+            line-height: 1.5;
+        }
+        
+        .book-review-score {
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
     </style>
 </head>
 
@@ -161,15 +200,9 @@
 
             </div>
             <div class="input-box">
-                <img src="/static/images/mag.png" />
-                <i class="fas fa-search"></i>
+                <img src='{{ url_for('static', filename='images/mag.png') }}' />
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
-                <div class="wrapper">
-                    <div class="input-box" onclick="sendFocus2()">
-                        <img src="{{ url_for('static', filename='images/mag.png') }}" />
-                        <input placeholder="Search by mood or interest" id="mood-input" onkeyup="showMood()">
-                    </div>
-                </div>
+                    <input placeholder="Search by mood" id="mood-input" onkeyup="showMood()" maxlength="100">
             </div>
         </div>
 
@@ -181,38 +214,39 @@
     <script src="../static/books_titles.js"></script>
     <script>
 
-function answerBox2(title, authors, description, score) {
-    return `
-        <div class='recommendation-container'>
-            <h3 class='book-title'>${title}</h3>
-            <p class='book-authors'>${authors}</p>
-            <p class='book-description'>${description}</p>
-            <p class='book-review-score'>Review Score: ${score}</p>
-        </div>`;
-}
+        function answerBox2(title, authors, description, score) {
+            return `
+                <div class='recommendation-container'>
+                    <h3 class='book-title'>${title}</h3>
+                    <p class='book-authors'>${authors}</p>
+                    <p class='book-description'>${description}</p>
+                    <p class='book-review-score'>Review Score: ${score}</p>
+                </div>`;
+        };
 
-function sendFocus2() {
-    document.getElementById('mood-input').focus();
-}
+        function sendFocus2() {
+            document.getElementById('mood-input').focus();
+        };
+    
 
-function showMood() {
-    const input = document.getElementById('mood-input').value; 
-    const answerBox = document.getElementById('answer-box-2');     
-    answerBox.innerHTML = '';  
+        function showMood() {
+            const input = document.getElementById('mood-input').value; 
+            const answerBox = document.getElementById('answer-box-2');     
+            answerBox.innerHTML = '';  
 
-    if (input.trim() !== '') {
-        fetch("/mood?" + new URLSearchParams({ mood: input }))
-            .then(response => response.json())
-            .then(data => {
-                // Display each book received from the server
-                data.forEach(book => {
-                    const bookDivClass = document.createElement('div');
-                    bookDivClass.innerHTML = answerBox2(book.Title, book.authors, book.descript, book.review_score);
-                    answerBox.appendChild(bookDivClass);
-                });
-            })
-    }
-}
+            if (input.trim() !== '') {
+                fetch("/mood?" + new URLSearchParams({ mood: input }))
+                    .then(response => response.json())
+                    .then(data => {
+                        // Display each book received from the server
+                        data.forEach(book => {
+                            const bookDivClass = document.createElement('div');
+                            bookDivClass.innerHTML = answerBox2(book.Title, book.authors, book.descript, book.review_score);
+                            answerBox.appendChild(bookDivClass);
+                        });
+                    })
+            }
+        };
 
         // Help switch from intro page to the search page
         function showSearch(containerClass) {
@@ -220,13 +254,13 @@ function showMood() {
             document.querySelector('.full-body-container').style.display = 'none';
             document.querySelector('.full-body-container-2').style.display = 'none';
             document.querySelector('.' + containerClass).style.display = 'block';
-        }
+        };
         //lets user go back to the intro/main page
         function showIntroduction() {
             document.querySelector('.introduction-page').style.display = 'block';
             document.querySelector('.full-body-container').style.display = 'none';
             document.querySelector('.full-body-container-2').style.display = 'none';
-        }
+        };
         const searchWrapper = document.querySelector('.search-input');
         const inputBox = searchWrapper.querySelector('input');
         const suggBox = searchWrapper.querySelector('.autocom-box');
@@ -283,7 +317,7 @@ function showMood() {
             query()
             searchWrapper.classList.remove('active');
             inputBox.focus();
-        }
+        };
 
         function showSuggestions(list) {
 
@@ -295,7 +329,7 @@ function showMood() {
                 listData = list.join('');
             }
             suggBox.innerHTML = listData;
-        }
+        };
 
         inputBox.addEventListener('focusout', (e) =>
             setTimeout(() => searchWrapper.classList.remove('active'), 200)
@@ -310,11 +344,11 @@ function showMood() {
                 <p class='book-description'>${description}</p>
                 <p class='book-review-score'>Review Score: ${score}</p>
             </div>`;
-        }
+        };
 
         function sendFocus() {
             document.getElementsByClassName('input-box').focus()
-        }
+        };
 
         function query() {
             searchWrapper.classList.remove('active');
