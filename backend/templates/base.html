@@ -85,14 +85,14 @@
             align-items: center;
             margin: 10px auto;
             padding: 10px;
-            position: relative; 
-            width: 600px; 
+            position: relative;
+            width: 600px;
         }
 
         .input-box img {
             position: absolute;
-            left: 3px; 
-            top: 50%; 
+            left: 3px;
+            top: 50%;
             transform: translateY(-50%);
             z-index: 10;
         }
@@ -101,17 +101,16 @@
             color: #0ed988;
             font-weight: bold;
         }
-        
+
         .book-description {
             color: #091241;
             line-height: 1.5;
         }
-        
+
         .book-review-score {
             font-weight: bold;
             margin-top: 15px;
         }
-
     </style>
 </head>
 
@@ -200,9 +199,9 @@
 
             </div>
             <div class="input-box">
-                <img src='{{ url_for('static', filename='images/mag.png') }}' />
+                <img src="{{ url_for('static', filename='images/mag.png' ) }}" />
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
-                    <input placeholder="Search by mood" id="mood-input" onkeyup="showMood()" maxlength="100">
+                <input placeholder="Search by mood" id="mood-input" onkeyup="showMood()" maxlength="100">
             </div>
         </div>
 
@@ -214,25 +213,28 @@
     <script src="../static/books_titles.js"></script>
     <script>
 
-        function answerBox2(title, authors, description, score) {
+        function answerBox2(title, authors, description, score, count, image) {
             return `
-                <div class='recommendation-container'>
-                    <h3 class='book-title'>${title}</h3>
-                    <p class='book-authors'>${authors}</p>
-                    <p class='book-description'>${description}</p>
-                    <p class='book-review-score'>Review Score: ${score}</p>
+                <div class='recommendation-container' style='display: flex; align-items: flex-start;'>
+                    <div class='book-details'>
+                        <h3 class='book-title'>${title}</h3>
+                        <p class='book-authors'>${authors}</p>
+                        <p class='book-description'>${description}</p>
+                        <p class='book-review-score-count'>Review Score: ${score} (${count})</p>
+                    </div>
+                    <img src="${image}" alt="Book cover" class='book-image' style='margin-left: 20px;' />
                 </div>`;
         };
 
         function sendFocus2() {
             document.getElementById('mood-input').focus();
         };
-    
+
 
         function showMood() {
-            const input = document.getElementById('mood-input').value; 
-            const answerBox = document.getElementById('answer-box-2');     
-            answerBox.innerHTML = '';  
+            const input = document.getElementById('mood-input').value;
+            const answerBox = document.getElementById('answer-box-2');
+            answerBox.innerHTML = '';
 
             if (input.trim() !== '') {
                 fetch("/mood?" + new URLSearchParams({ mood: input }))
@@ -241,7 +243,7 @@
                         // Display each book received from the server
                         data.forEach(book => {
                             const bookDivClass = document.createElement('div');
-                            bookDivClass.innerHTML = answerBox2(book.Title, book.authors, book.descript, book.review_score);
+                            bookDivClass.innerHTML = answerBox2(book.Title, book.authors, book.descript, book.review_score, book.review_count, book.image);
                             answerBox.appendChild(bookDivClass);
                         });
                     })
@@ -335,16 +337,20 @@
             setTimeout(() => searchWrapper.classList.remove('active'), 200)
         );
 
-        function answerBoxTemplate(title, authors, categories, description, score) {
+        function answerBoxTemplate(title, authors, categories, description, score, count, image) {
             return `
-            <div class='recommendation-container'>
-                <h3 class='book-title'>${title}</h3>
-                <p class='book-authors'>${authors}</p>
-                <p class='book-categories'>${categories}</p>
-                <p class='book-description'>${description}</p>
-                <p class='book-review-score'>Review Score: ${score}</p>
-            </div>`;
+                <div class='recommendation-container' style='display: flex; align-items: flex-start;'>
+                    <div class='book-details'>
+                        <h3 class='book-title'>${title}</h3>
+                        <p class='book-authors'>${authors}</p>
+                        <p class='book-categories'>${categories}</p>
+                        <p class='book-description'>${description}</p>
+                        <p class='book-review-score-count'>Review Score: ${score} (${count})</p>
+                    </div>
+                    <img src="${image}" alt="Book cover" class='book-image' style='margin-left: 20px;' />
+                </div>`;
         };
+
 
         function sendFocus() {
             document.getElementsByClassName('input-box').focus()
@@ -367,7 +373,7 @@
                         document.getElementById("answer-box").innerHTML = "";
                         data.slice(0, 10).forEach(row => {
                             let tempDiv = document.createElement("div");
-                            tempDiv.innerHTML = answerBoxTemplate(row.Title, row.authors, row.categories, row.descript, row.review_score);
+                            tempDiv.innerHTML = answerBoxTemplate(row.Title, row.authors, row.categories, row.descript, row.review_score, row.review_count, row.image);
                             document.getElementById("answer-box").appendChild(tempDiv);
                         });
                     });
