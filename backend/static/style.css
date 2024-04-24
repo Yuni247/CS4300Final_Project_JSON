@@ -4,9 +4,11 @@
     left: 0;
     right: 0;
     bottom: 0;
-    width: 100%;
+    width: 75%;
     height: 100%;
     display: flex;
+    margin-left: auto;
+    margin-right: auto;
     justify-content: start;
     align-items: center;
     flex-direction: column;
@@ -19,9 +21,11 @@
     left: 0;
     right: 0;
     bottom: 0;
-    width: 100%;
+    width: 75%;
     height: 100%;
     display: flex;
+    margin-left: auto;
+    margin-right: auto;
     justify-content: start;
     align-items: center;
     flex-direction: column;
@@ -105,10 +109,10 @@
 
 .recommendation-container {
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    width: 75%;
+    grid-template-columns: 1fr 3.5fr 3.5fr 1fr 1fr;
+    /* Allocates space for the content and image with extra space at the end */
+    width: 100%;
     margin-left: auto;
-    /* Centers the container */
     margin-right: auto;
     align-items: center;
     gap: 10px;
@@ -117,9 +121,10 @@
 
 
 
+
 .book-details {
     width: 100%;
-    grid-column: 2 / 6;
+    grid-column: 2 / 4;
     /* Spans from the start of column 2 to the end of column 5 */
     display: flex;
     /* Makes the book details a flex container */
@@ -135,7 +140,7 @@
 
 
 .book-image {
-    grid-column: 6 / 7;
+    grid-column: 4 / 5;
     /* Spans from the start of column 6 to the end of column 6 */
     width: 100%;
     /* Adjusts the width of the image to fit the column */
