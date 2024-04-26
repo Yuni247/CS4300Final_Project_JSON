@@ -183,7 +183,7 @@ def books_search():
     combined_df = pd.DataFrame(combined_list, columns=[ 'Title', 'cossim_score'])
     combined_df['Title'], books_df['Title'] = combined_df['Title'].astype(str), books_df['Title'].astype(str)
 
-    final_df = pd.merge(combined_df, books_df[['Title', 'authors', 'categories', 'descript', 'review_score', 'review_count']], on='Title', how='left')
+    final_df = pd.merge(combined_df, books_df[['Title', 'authors', 'categories', 'descript', 'review_score', 'review_count', 'image']], on='Title', how='left')
     
     # sort the final df by the cossim scores, take only the top 10
     top_recs = final_df.sort_values(by='cossim_score', ascending=False).head(10)
