@@ -262,18 +262,65 @@
             <div class="input-box">
                 <img src="{{ url_for('static', filename='images/mag.png' ) }}" />
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
-                <input placeholder="Search by mood" id="mood-input" onkeyup="showMood()" maxlength="100">
+                <input placeholder="Search by mood" id="mood-input"  maxlength="100"> 
+                <!-- onkeyup="showMood()" -->
             </div>
         </div>
-
-        <div id="answer-box-2">
-
+        <div class="autocom-box-2">
+            <!-- here list is inserted from JavaScript -->
         </div>
+        <div id="answer-box-2"> </div>
     </div>
     <script src="../static/books_titles.js"></script>
     <script src="../static/moods.js"></script>
 
     <script>
+
+        const resultBox = document.querySelector('.autocom-box-2');
+        const input = document.getElementById('mood-input');
+        input.onkeyup = (e) => {
+            let userData = e.target.value; // user entered data
+            let emptyArray = [];
+            if (userData) {
+                emptyArray = moods.filter((data) => {
+                    // filtering array value and user characters to lowercase and return only those words which start with the user entered characters
+                    return data.toLowerCase().startsWith(userData.toLowerCase());
+                });
+                emptyArray = emptyArray.map((data) => {
+                    // passing return data inside ul tag
+                    return `<ul>${data}</ul>`;
+                });
+                resultBox.classList.add('active'); // show autocomplete box
+                showSuggestions2(emptyArray);
+                let allList = resultBox.querySelectorAll('ul');
+                console.log(allList)
+                for (let i = 0; i < allList.length; i++) {
+                    // adding onclick attribute in all ul tags
+                    allList[i].setAttribute('onclick', 'select2(this)');
+                }
+            } else {
+                resultBox.classList.remove('active'); // hide autocomplete box
+            }
+        };
+        function showSuggestions2(list) {
+            let listData;
+            if (!list.length) {
+                userValue = input.value;
+                listData = `<ul>${userValue}</ul>`;
+            } else {
+                listData = list.join('');
+            }
+            resultBox.innerHTML = listData;
+        };
+
+        function select2(element) {
+            let selectData = element.textContent;
+            input.value = selectData;
+            showMood()
+            resultBox.classList.remove('active');
+            input.focus();
+        };
+
 
         function answerBox2(title, authors, description, score, count, image) {
             return `
@@ -294,12 +341,11 @@
 
 
         function showMood() {
-            const input = document.getElementById('mood-input').value;
             const answerBox = document.getElementById('answer-box-2');
             answerBox.innerHTML = '';
-
-            if (input.trim() !== '') {
-                fetch("/mood?" + new URLSearchParams({ mood: input }))
+            interest = input.value;
+            if (interest.trim() !== '') {
+                fetch("/mood?" + new URLSearchParams({ mood: interest.value }))
                     .then(response => response.json())
                     .then(data => {
                         // Display each book received from the server
@@ -352,7 +398,6 @@
         // if user presses any key and releases
         inputBox.onkeyup = (e) => {
             let userData = e.target.value; // user entered data
-
             let emptyArray = [];
             if (userData) {
                 emptyArray = titles.filter((data) => {
@@ -360,15 +405,14 @@
                     return data.toLowerCase().startsWith(userData.toLowerCase());
                 });
                 emptyArray = emptyArray.map((data) => {
-                    // passing return data inside li tag
+                    // passing return data inside ul tag
                     return `<ul>${data}</ul>`;
                 });
                 suggBox.classList.add('active'); // show autocomplete box
                 showSuggestions(emptyArray);
                 let allList = suggBox.querySelectorAll('ul');
-                console.log(allList)
                 for (let i = 0; i < allList.length; i++) {
-                    // adding onclick attribute in all li tags
+                    // adding onclick attribute in all ul tags
                     allList[i].setAttribute('onclick', 'select(this)');
                 }
             } else {
