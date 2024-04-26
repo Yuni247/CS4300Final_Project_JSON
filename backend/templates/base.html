@@ -157,7 +157,10 @@
             (i.e. 5 vs 50 reviews is a more important difference than 1000 vs 1100 reviews). </p>
         <h3>When Inputting a Theme:</h3>
         <!-- TODO -->
-        <p>TBA :D<br><br></p>
+        <p>The word you input is matched against the descriptions of the books in the database by an SVD computation. 
+            <br>This search emphasizes the words in the description of the book to determine the book that would fit the free form input word a user gives it.<br>
+            <br><br>
+        </p>
 
         <div class="introduction-page" style="display: block;">
             <div class="introduction-text">
@@ -190,17 +193,14 @@
                     <div class="search-input">
                         <a href="" target="_blank" hidden></a>
                         <input id="" type="text" placeholder="Search for your next read..." />
-                        <div class="autocom-box">
-                            <!-- here list is inserted from JavaScript -->
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div id="answer-box">
-
+        <div class="autocom-box">
+            <!-- here list is inserted from JavaScript -->
         </div>
+        <div id="answer-box"> </div>
     </div>
     <!-- This is for the SVD search page -->
     <div class="full-body-container-2" style="display: none;">
@@ -216,7 +216,7 @@
                 <h1 id="google-3">B</h1>
             </div>
             <h3 class='book-version-title'>Version: Mood Input</h3>
-            <p class='book-description'>Type in the mood or theme of the book you're looking for!</p>
+            <p class='book-description'>Type in the mood or theme of the book you're looking for! We'll recommend a book that aligns with your mood!</p>
             <div class="input-box">
                 <img src="{{ url_for('static', filename='images/mag.png' ) }}" />
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
@@ -285,7 +285,7 @@
         };
         const searchWrapper = document.querySelector('.search-input');
         const inputBox = searchWrapper.querySelector('input');
-        const suggBox = searchWrapper.querySelector('.autocom-box');
+        const suggBox = document.querySelector('.autocom-box');
         const icon = document.getElementsByClassName('fa-search');
 
 
@@ -319,17 +319,18 @@
                 });
                 emptyArray = emptyArray.map((data) => {
                     // passing return data inside li tag
-                    return `<li>${data}</li>`;
+                    return `<ul>${data}</ul>`;
                 });
-                searchWrapper.classList.add('active'); // show autocomplete box
+                suggBox.classList.add('active'); // show autocomplete box
                 showSuggestions(emptyArray);
-                let allList = suggBox.querySelectorAll('li');
+                let allList = suggBox.querySelectorAll('ul');
+                console.log(allList)
                 for (let i = 0; i < allList.length; i++) {
                     // adding onclick attribute in all li tags
                     allList[i].setAttribute('onclick', 'select(this)');
                 }
             } else {
-                searchWrapper.classList.remove('active'); // hide autocomplete box
+                suggBox.classList.remove('active'); // hide autocomplete box
             }
         };
 
@@ -346,7 +347,7 @@
             let listData;
             if (!list.length) {
                 userValue = inputBox.value;
-                listData = `<li>${userValue}</li>`;
+                listData = `<ul>${userValue}</ul>`;
             } else {
                 listData = list.join('');
             }

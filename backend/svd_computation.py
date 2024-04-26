@@ -67,7 +67,7 @@ def closest_projects_to_word(word_in, k = 5):
 
 def recommend_book(mood_interest):
   filtered_books = []
-  for i, proj, sim in closest_projects_to_word(mood_interest):
+  for _, proj, _ in closest_projects_to_word(mood_interest):
     filtered_books.append(proj)
   if filtered_books:
     return filtered_books
