@@ -359,12 +359,11 @@
 
         function answerBox2(title, authors, description, score, count, image) {
             //to make sure if any of these is undefined, to replace it with the following
-            title = (title !== undefined) ? title : "There's no title.";
-            authors = (authors !== undefined) ? authors : "There are no authors.";
-            description = (description !== undefined) ? description : "There's no description.";
+            title = (title !== "undefined") ? title : "There's no title.";
+            authors = (authors !== "undefined") ? authors : "There are no authors.";
+            description = (description !== "undefined") ? description : "There's no description.";
             score = (score !== undefined) ? score : "There's no review score"; 
             count = (count !== undefined) ? count : "no"; 
-            image = (image !== undefined) ? image : "/static/images/magic.jpeg"; 
             return `
                 <div class='recommendation-container'>
                     <div class='book-details'>
@@ -485,6 +484,13 @@
         );
 
         function answerBoxTemplate(title, authors, categories, description, score, count, image) {
+                        //to make sure if any of these is undefined, to replace it with the following
+            title = (title !== "undefined") ? title : "There's no title.";
+            authors = (authors !== "undefined") ? authors.replace(/^\[|\]$/g, '').replace(/^'(.*)'$/, "$1") : "There are no authors.";
+            categories = (categories !== "undefined") ? categories.replace(/^\[|\]$/g, '').replace(/\'/g, "") : "There are no categories.";
+            description = (description !== "undefined") ? description : "There's no description.";
+            score = (score !== undefined) ? score : "There's no review score"; 
+            count = (count !== undefined) ? count : "no"; 
             return `
                 <div class='recommendation-container'>
                     <div class='book-details'>
@@ -492,7 +498,7 @@
                         <p class='book-authors'>Authors: ${authors}</p>
                         <p class='book-categories'>Categories: ${categories}</p>
                         <p class='book-description'>Description: ${description}</p>
-                        <p class='book-review-score-count'>Review Score: ${score} (${count})</p>
+                        <p class='book-review-score-count'>Rating: ${score.toFixed(2)} based on ${count} reviews.</p>
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image'/>
                 </div>`;
