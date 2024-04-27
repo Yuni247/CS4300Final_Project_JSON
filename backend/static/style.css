@@ -16,13 +16,13 @@
 }
 
 .full-body-container-2 {
-    position: absolute;
+    /* position: absolute; */
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    width: 75%;
-    height: 100%;
+    width: 100%;
+    height: auto;
     display: flex;
     margin-left: auto;
     margin-right: auto;
@@ -31,6 +31,7 @@
     flex-direction: column;
     background-color: #F4ECD7;
 }
+
 
 #google-1 {
     color: #515151;
@@ -91,8 +92,14 @@
     font-size: 16px;
     border: none;
     outline: 0;
+    background-color: #F4ECD7;
 }
-
+.input-box input[type="text"] {
+    width: 100%;
+    padding-left: 40px; 
+    border: none;
+    outline: none; 
+}
 #answer-box {
     width: 700px;
     margin-top: 50px;
@@ -110,7 +117,6 @@
 .recommendation-container {
     display: grid;
     grid-template-columns: 1fr 3.5fr 3.5fr 1fr 1fr;
-    /* Allocates space for the content and image with extra space at the end */
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -123,48 +129,44 @@
 .book-details {
     width: 100%;
     grid-column: 2 / 4;
-    /* Spans from the start of column 2 to the end of column 5 */
     display: flex;
-    /* Makes the book details a flex container */
     flex-direction: column;
-    /* Stacks the children of book-details vertically */
     justify-content: center;
-    /* Centers the book details vertically */
     align-items: center;
-    /* Centers the book details horizontally */
     text-align: center;
-    /* Ensures text within each element is centered */
 }
 
 
 .book-image {
     grid-column: 4 / 5;
-    /* Spans from the start of column 6 to the end of column 6 */
     width: 100%;
-    /* Adjusts the width of the image to fit the column */
     max-width: 100px;
-    /* Sets a maximum width to keep images uniform */
     height: auto;
-    /* Maintains the aspect ratio of the image */
     object-fit: cover;
-    /* Ensures the image covers the area without stretching */
     display: block;
-    /* Makes image a block element */
     margin: 0 auto;
-    /* Centers the image horizontally within its container */
+}
+
+.autocom-box, .autocom-box ul, .autocom-box ul li {
+    background-color: #F4ECD7;
+    margin: 0;
+    padding: 0; 
+    border: none; 
+}
+
+.autocom-box ul li {
+    width: 100%; 
+    list-style-type: none; 
+    padding: 10px; 
+    margin-bottom: 5px; 
+    border-bottom: 1px solid #ddd; 
 }
 
 .autocom-box ul {
-    border-top: 1px solid #999;
-    padding: 15px 10px;
-  }
-.autocom-box ul li {
-    list-style: none;
-    border-radius: 3px;
-    padding: 15px 10px;
-    cursor: pointer;
+    list-style-type: none; 
 }
-.autocom-box ul li:hover {
-    background: #e9f3ff;
+
+.autocom-box-2 {
+    width: 100%; 
 }
   

@@ -26,10 +26,11 @@
 
         body {
             background-image: url("/static/images/left_shelf.jpg"), url("/static/images/right_shelf.jpg");
-            background-position: left center, right center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-size: contain, contain;
+            background-position: left top, right top; 
+            background-size: 50% 100%, 50% 100%; 
+            overflow-x: hidden;
         }
 
         .introduction-page {
@@ -92,13 +93,21 @@
             align-items: flex-start;
             gap: 20px;
             margin: 20px 0;
-            width: 100%
+            width: 100%;
+            border: 3px solid black;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .recommendation-container:hover {
+            border-color: orange;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);  
         }
 
         .book-image {
             width: 150px;
             height: auto;
-            margin-left: 20px;
+            margin-left: 30px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
@@ -108,7 +117,20 @@
             align-items: center;
             width: 100%
         }
+        .autocom-box ul {
+            background-color: #F4ECD7;
+            padding: 0; 
+            list-style-type: none;
+            margin: 0; 
+        }
 
+        .autocom-box ul li {
+            background-color: #F4ECD7; 
+            padding: 10px; 
+            margin-bottom: 5px; 
+            border-bottom: 1px solid #ddd;
+
+        }
         .input-box {
             border-radius: 50px;
             border: 1px solid black;
@@ -118,6 +140,11 @@
             padding: 10px;
             position: relative;
             width: 600px;
+            background-color: transparent;
+            
+        }
+        .input-box input {
+            background-color: transparent; 
         }
 
         .input-box img {
@@ -127,7 +154,13 @@
             transform: translateY(-50%);
             z-index: 10;
         }
-
+        .input-box input[type="text"] {
+            width: 100%; 
+            padding: 10px; 
+            margin-left: 30px;
+            border: none; 
+            outline: none; 
+        }
         .book-title {
             color: #8A6E43;
             font-weight: bold;
@@ -243,7 +276,6 @@
             </div>
         </div>
         <div class="autocom-box">
-            <!-- here list is inserted from JavaScript -->
         </div>
         <div id="answer-box"> </div>
     </div>
@@ -266,11 +298,9 @@
                 <img src="{{ url_for('static', filename='images/mag.png' ) }}" />
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
                 <input placeholder="Search by mood" id="mood-input"  maxlength="100"> 
-                <!-- onkeyup="showMood()" -->
             </div>
         </div>
         <div class="autocom-box-2">
-            <!-- here list is inserted from JavaScript -->
         </div>
         <div id="answer-box-2"> </div>
     </div>
