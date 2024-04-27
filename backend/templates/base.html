@@ -26,7 +26,7 @@
 
         body {
             background-image: url("/static/images/left_shelf.jpg"), url("/static/images/right_shelf.jpg");
-            background-repeat: no-repeat;
+            background-repeat: no-repeat, no-repeat;
             background-attachment: fixed;
             background-position: left top, right top; 
             background-size: 50% 100%, 50% 100%; 
@@ -130,6 +130,10 @@
             margin-bottom: 5px; 
             border-bottom: 1px solid #ddd;
 
+        }
+        .autocom-box-2{
+            background-color: #F4ECD7;
+            position: relative;
         }
         .input-box {
             border-radius: 50px;
@@ -316,11 +320,9 @@
             let emptyArray = [];
             if (userData) {
                 emptyArray = moods.filter((data) => {
-                    // filtering array value and user characters to lowercase and return only those words which start with the user entered characters
                     return data.toLowerCase().startsWith(userData.toLowerCase());
                 });
                 emptyArray = emptyArray.map((data) => {
-                    // passing return data inside ul tag
                     return `<ul>${data}</ul>`;
                 });
                 resultBox.classList.add('active'); // show autocomplete box
@@ -328,13 +330,13 @@
                 let allList = resultBox.querySelectorAll('ul');
                 console.log(allList)
                 for (let i = 0; i < allList.length; i++) {
-                    // adding onclick attribute in all ul tags
                     allList[i].setAttribute('onclick', 'select2(this)');
                 }
             } else {
                 resultBox.classList.remove('active'); // hide autocomplete box
             }
         };
+
         function showSuggestions2(list) {
             let listData;
             if (!list.length) {
@@ -356,13 +358,20 @@
 
 
         function answerBox2(title, authors, description, score, count, image) {
+            //to make sure if any of these is undefined, to replace it with the following
+            title = (title !== undefined) ? title : "There's no title.";
+            authors = (authors !== undefined) ? authors : "There are no authors.";
+            description = (description !== undefined) ? description : "There's no description.";
+            score = (score !== undefined) ? score : "There's no review score"; 
+            count = (count !== undefined) ? count : "no"; 
+            image = (image !== undefined) ? image : "/static/images/magic.jpeg"; 
             return `
                 <div class='recommendation-container'>
                     <div class='book-details'>
-                        <h3 class='book-title'>${title}</h3>
-                        <p class='book-authors'>${authors}</p>
-                        <p class='book-description'>${description}</p>
-                        <p class='book-review-score-count'>Review Score: ${score} (${count})</p>
+                        <h3 class='book-title'>Title: ${title}</h3>
+                        <p class='book-authors'>Authors: ${authors}</p>
+                        <p class='book-description'>Description: ${description}</p>
+                        <p class='book-review-score-count'>Rating: ${score} based on ${count} reviews. </p>
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image' />
                 </div>`;
@@ -374,6 +383,7 @@
 
 
         function showMood() {
+            console.log("inside showmood")
             const answerBox = document.getElementById('answer-box-2');
             answerBox.innerHTML = '';
             interest = input.value;
@@ -381,9 +391,9 @@
                 fetch("/mood?" + new URLSearchParams({ mood: interest.value }))
                     .then(response => response.json())
                     .then(data => {
-                        // Display each book received from the server
                         data.forEach(book => {
                             const bookDivClass = document.createElement('div');
+                            console.log("the rec book is "+book);
                             bookDivClass.innerHTML = answerBox2(book.Title, book.authors, book.descript, book.review_score, book.review_count, book.image);
                             answerBox.appendChild(bookDivClass);
                         });
@@ -430,26 +440,23 @@
 
         // if user presses any key and releases
         inputBox.onkeyup = (e) => {
-            let userData = e.target.value; // user entered data
+            let userData = e.target.value; 
             let emptyArray = [];
             if (userData) {
                 emptyArray = titles.filter((data) => {
-                    // filtering array value and user characters to lowercase and return only those words which start with the user entered characters
                     return data.toLowerCase().startsWith(userData.toLowerCase());
                 });
                 emptyArray = emptyArray.map((data) => {
-                    // passing return data inside ul tag
                     return `<ul>${data}</ul>`;
                 });
-                suggBox.classList.add('active'); // show autocomplete box
+                suggBox.classList.add('active'); 
                 showSuggestions(emptyArray);
                 let allList = suggBox.querySelectorAll('ul');
                 for (let i = 0; i < allList.length; i++) {
-                    // adding onclick attribute in all ul tags
                     allList[i].setAttribute('onclick', 'select(this)');
                 }
             } else {
-                suggBox.classList.remove('active'); // hide autocomplete box
+                suggBox.classList.remove('active'); 
             }
         };
 
@@ -481,10 +488,10 @@
             return `
                 <div class='recommendation-container'>
                     <div class='book-details'>
-                        <h3 class='book-title'>${title}</h3>
-                        <p class='book-authors'>${authors}</p>
-                        <p class='book-categories'>${categories}</p>
-                        <p class='book-description'>${description}</p>
+                        <h3 class='book-title'>Title: ${title}</h3>
+                        <p class='book-authors'>Authors: ${authors}</p>
+                        <p class='book-categories'>Categories: ${categories}</p>
+                        <p class='book-description'>Description: ${description}</p>
                         <p class='book-review-score-count'>Review Score: ${score} (${count})</p>
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image'/>
