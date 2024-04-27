@@ -359,8 +359,9 @@
 
         function answerBox2(title, authors, description, score, count, image) {
             //to make sure if any of these is undefined, to replace it with the following
+            //rid the quotes
             title = (title !== "undefined") ? title : "There's no title.";
-            authors = (authors !== "undefined") ? authors : "There are no authors.";
+            authors = (authors !== "undefined") ? authors.replace(/^\[|\]$/g, '').replace(/^'(.*)'$/, "$1") : "There are no authors.";
             description = (description !== "undefined") ? description : "There's no description.";
             score = (score !== undefined) ? score : "There's no review score"; 
             count = (count !== undefined) ? count : "no"; 
@@ -487,7 +488,7 @@
                         //to make sure if any of these is undefined, to replace it with the following
             title = (title !== "undefined") ? title : "There's no title.";
             authors = (authors !== "undefined") ? authors.replace(/^\[|\]$/g, '').replace(/^'(.*)'$/, "$1") : "There are no authors.";
-            categories = (categories !== "undefined") ? categories.replace(/^\[|\]$/g, '').replace(/\'/g, "") : "There are no categories.";
+            categories = (categories !== "undefined") ? categories.replace(/^\[|\]$/g, '').replace(/\"/g, '') : "There are no categories.";
             description = (description !== "undefined") ? description : "There's no description.";
             score = (score !== undefined) ? score : "There's no review score"; 
             count = (count !== undefined) ? count : "no"; 
