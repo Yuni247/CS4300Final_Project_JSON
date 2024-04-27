@@ -269,7 +269,7 @@
             <p class='book-description'>Start typing in the title of a book you've already read and press "Enter"--we'll
                 recommend
                 books
-                similar to it!</p>
+                similar to it! *Please note that for "image not found" results, the original website took the image down. </p>
             <div class="input-box">
                 <img src="/static/images/mag.png" />
                 <i class="fas fa-search"></i>
@@ -376,8 +376,7 @@
                         <p class='book-authors'>Authors: ${authors}</p>
                         <p class='book-description'>Description: ${description}</p>
                         <p class='book-review-score-count'>Rating: ${score} based on ${count} reviews. </p>
-                        <p class='book-review-score-count'>Image link: ${image} </p>
-
+                        <p class='book-review-score-count'>Image link: <a href="${image}" target="_blank">Click to view</a></p>
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image' />
                 </div>`;
@@ -506,7 +505,7 @@
                         <p class='book-categories'>Categories: ${categories}</p>
                         <p class='book-description'>Description: ${description}</p>
                         <p class='book-review-score-count'>Rating: ${score.toFixed(2)} based on ${count} reviews.</p>
-                        <p class='book-review-score-count'>Image link: ${image} </p>
+                        <p class='book-review-score-count'>Image link: <a href="${image}" target="_blank">Click to view</a></p>
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image'/>
                 </div>`;
