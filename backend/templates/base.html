@@ -16,20 +16,21 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            background-image: url("/static/images/left_shelf.jpg"), url("/static/images/right_shelf.jpg");
+            background-image: url("/static/images/office.jpg");
             background-position: left center, right center;
             background-repeat: no-repeat;
-            background-size: auto 100vh;
+            background-size: cover;
             background-attachment: fixed;
             overflow-x: hidden;
         }
-
         body {
-            background-image: url("/static/images/left_shelf.jpg"), url("/static/images/right_shelf.jpg");
+            background: url("/static/images/office.jpg") no-repeat center center fixed;
             background-repeat: no-repeat, no-repeat;
             background-attachment: fixed;
             background-position: left top, right top; 
-            background-size: 50% 100%, 50% 100%; 
+            background-size: 100% 100%, 100% 100%; 
+            height: 100vh;
+            width: 100%;
             overflow-x: hidden;
         }
 
@@ -88,6 +89,8 @@
         }
 
         .recommendation-container {
+            position: relative; 
+            z-index: 10;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -297,7 +300,8 @@
                 <h1 id="google-3">B</h1>
             </div>
             <h3 class='book-version-title'>Version: Mood Input</h3>
-            <p class='book-description'>Type in the mood or theme of the book you're looking for! We'll recommend a book that aligns with your mood!</p>
+            <p class='book-description'>Type in the mood or theme of the book you're looking for! We'll recommend a book that aligns with your mood! 
+                *Please note that for "image not found" results, the original website took the image down.  </p>
             <div class="input-box">
                 <img src="{{ url_for('static', filename='images/mag.png' ) }}" />
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
@@ -372,6 +376,8 @@
                         <p class='book-authors'>Authors: ${authors}</p>
                         <p class='book-description'>Description: ${description}</p>
                         <p class='book-review-score-count'>Rating: ${score} based on ${count} reviews. </p>
+                        <p class='book-review-score-count'>Image link: ${image} </p>
+
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image' />
                 </div>`;
@@ -500,6 +506,7 @@
                         <p class='book-categories'>Categories: ${categories}</p>
                         <p class='book-description'>Description: ${description}</p>
                         <p class='book-review-score-count'>Rating: ${score.toFixed(2)} based on ${count} reviews.</p>
+                        <p class='book-review-score-count'>Image link: ${image} </p>
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image'/>
                 </div>`;
