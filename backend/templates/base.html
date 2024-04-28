@@ -49,7 +49,7 @@
         .introduction-text {
             width: 600px;
             padding: 20px;
-            background-color: rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.5);
             border-radius: 10px;
             text-align: center;
             transform: translateX(+45%);
@@ -104,7 +104,8 @@
 
         .recommendation-container:hover {
             border-color: orange;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);  
+            border-width: 5px;
+            box-shadow: 0 10px 20px 5px rgba(0, 0, 0, 0.6);
         }
 
         .book-image {
@@ -204,6 +205,9 @@
             object-fit: cover;
             border-radius: 5px;
         }
+        .scroll{
+            font-size: 18px;
+        }
     </style>
 </head>
 
@@ -221,11 +225,7 @@
                     <p>To search books by mood/interest, click below:</p>
                     <button onclick="showSearch('full-body-container-2')">Click to Continue</button><br><br><br>
                 </div>
-            </div>
-        </div>
-
-        <div class="introduction-page" style="display: block; padding-bottom: 20px;">
-            <div class="introduction-text">
+                <p class="scroll"> *Scroll down for more information!</p>
                 <p>Our Database</p>
                 <p style="font-size: 0.8em;">Our data is based off of books sold on Amazon. The data includes the book
                     titles, descriptions, authors, publishers, categories, review scores, and review counts.</p>
@@ -242,13 +242,13 @@
                     <br>This search emphasizes the words in the description of the book to determine the book that would fit the free form input word a user gives it.<br>
                     <br><br>
                 </p>
+                <p style="font-size: 18px">Thank you for visiting our Book Hub. We hope you find something great to read!</p>
+                <p style="font-size: 18px">App Credits: Angella Jaden, Alan Park, Joy Lin, and CS4300 Course Staff</p>
+                <p style="font-size: 18px">Image Credits: <a href="${https://www.muralsyourway.com/book-shop-mural/p}" target="_blank">Intro page</a></p>
+                <p style="font-size: 18px"><a href="${https://www.deviantart.com/raeseddon2/art/Book-Store-951974713}" target="_blank">Bookhub pages</a></p>
             </div>
-        </div>
 
-        <div class="introduction-page" style="display: block;">
-            <div class="introduction-text">
-                <p>Thank you for visiting our Book Hub. We hope you find something great to read!</p>
-            </div>
+
         </div>
 
     </div>
@@ -269,7 +269,8 @@
             <p class='book-description'>Start typing in the title of a book you've already read and press "Enter"--we'll
                 recommend
                 books
-                similar to it! *Please note that for "image not found" results, the original website took the image down. </p>
+                similar to it!</p>
+                <p class='book-description'> *Please note that some websites took down some book images so some results may display for "image not found" as the image. </p>
             <div class="input-box">
                 <img src="/static/images/mag.png" />
                 <i class="fas fa-search"></i>
@@ -300,8 +301,8 @@
                 <h1 id="google-3">B</h1>
             </div>
             <h3 class='book-version-title'>Version: Mood Input</h3>
-            <p class='book-description'>Type in the mood or theme of the book you're looking for! We'll recommend a book that aligns with your mood! 
-                *Please note that for "image not found" results, the original website took the image down.  </p>
+            <p class='book-description'>Type in the mood or theme of the book you're looking for! We'll recommend a book that aligns with your mood! </p>
+            <p class='book-description'>*Please note that some websites took down some book images so some results may display for "image not found" as the image. </p>
             <div class="input-box">
                 <img src="{{ url_for('static', filename='images/mag.png' ) }}" />
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
