@@ -23,12 +23,13 @@
             background-attachment: fixed;
             overflow-x: hidden;
         }
+
         body {
             background: url("/static/images/office.jpg") no-repeat center center fixed;
             background-repeat: no-repeat, no-repeat;
             background-attachment: fixed;
-            background-position: left top, right top; 
-            background-size: 100% 100%, 100% 100%; 
+            background-position: left top, right top;
+            background-size: 100% 100%, 100% 100%;
             height: 100vh;
             width: 100%;
             overflow-x: hidden;
@@ -75,6 +76,49 @@
             margin-bottom: 5px;
         }
 
+        .star-rating {
+            font-size: 24px;
+            line-height: 1;
+            display: inline-block;
+            /* Keep the star rating in line with other inline elements */
+            position: relative;
+            /* Establish a positioning context for absolute children */
+            height: 24px;
+            /* Make this the same height as your stars */
+        }
+
+        .star-rating .full-stars,
+        .star-rating .empty-stars {
+            display: block;
+            /* Use block here to fill the container */
+            position: absolute;
+            /* Position them in the container */
+            top: 0;
+            left: 0;
+            white-space: nowrap;
+            /* No wrapping to a new line */
+        }
+
+        .star-rating .empty-stars::before {
+            content: "\u2606\u2606\u2606\u2606\u2606";
+            /* Five outlined stars */
+            color: #ccc;
+            /* Light gray color */
+            z-index: 0;
+        }
+
+        .star-rating .full-stars::before {
+            content: "\u2605\u2605\u2605\u2605\u2605";
+            /* Five filled stars */
+            color: orange;
+            /* Orange color */
+            width: 0;
+            /* This will be set dynamically */
+            z-index: 1;
+            overflow: hidden;
+            /* To hide the overflowing stars */
+        }
+
         .full-body-container,
         .full-body-container-2,
         p,
@@ -89,7 +133,7 @@
         }
 
         .recommendation-container {
-            position: relative; 
+            position: relative;
             z-index: 10;
             display: flex;
             justify-content: center;
@@ -121,24 +165,27 @@
             align-items: center;
             width: 100%
         }
+
         .autocom-box ul {
             background-color: #F4ECD7;
-            padding: 0; 
+            padding: 0;
             list-style-type: none;
-            margin: 0; 
+            margin: 0;
         }
 
         .autocom-box ul li {
-            background-color: #F4ECD7; 
-            padding: 10px; 
-            margin-bottom: 5px; 
+            background-color: #F4ECD7;
+            padding: 10px;
+            margin-bottom: 5px;
             border-bottom: 1px solid #ddd;
 
         }
-        .autocom-box-2{
+
+        .autocom-box-2 {
             background-color: #F4ECD7;
             position: relative;
         }
+
         .input-box {
             border-radius: 50px;
             border: 1px solid black;
@@ -149,10 +196,11 @@
             position: relative;
             width: 600px;
             background-color: transparent;
-            
+
         }
+
         .input-box input {
-            background-color: transparent; 
+            background-color: transparent;
         }
 
         .input-box img {
@@ -162,13 +210,15 @@
             transform: translateY(-50%);
             z-index: 10;
         }
+
         .input-box input[type="text"] {
-            width: 100%; 
-            padding: 10px; 
+            width: 100%;
+            padding: 10px;
             margin-left: 30px;
-            border: none; 
-            outline: none; 
+            border: none;
+            outline: none;
         }
+
         .book-title {
             color: #8A6E43;
             font-weight: bold;
@@ -205,7 +255,8 @@
             object-fit: cover;
             border-radius: 5px;
         }
-        .scroll{
+
+        .scroll {
             font-size: 18px;
         }
     </style>
@@ -224,7 +275,7 @@
                 </div>
                 <div class="button-group">
                     <p>To search books by mood/interest, click below:</p>
-                    <button onclick="showSearch('full-body-container-2')">Click to Continue</button><br>  <br> <br> 
+                    <button onclick="showSearch('full-body-container-2')">Click to Continue</button><br> <br> <br>
                 </div>
                 <p>Our Database</p>
                 <p style="font-size: 0.8em;">Our data is based off of books sold on Amazon. The data includes the book
@@ -238,11 +289,14 @@
                     count increases (i.e., 5 vs 50 reviews is a more important difference than 1000 vs 1100 reviews).
                 </p>
                 <p>When Inputting a Theme:</p>
-                <p style="font-size: 0.8em;">The word you input is matched against the descriptions of the books in the database by an SVD computation. 
-                    <br>This search emphasizes the words in the description of the book to determine the book that would fit the free form input word a user gives it.<br>
+                <p style="font-size: 0.8em;">The word you input is matched against the descriptions of the books in the
+                    database by an SVD computation.
+                    <br>This search emphasizes the words in the description of the book to determine the book that would
+                    fit the free form input word a user gives it.<br>
                     <br><br>
                 </p>
-                <p style="font-size: 18px">Thank you for visiting our Book Hub. We hope you find something great to read!</p>
+                <p style="font-size: 18px">Thank you for visiting our Book Hub. We hope you find something great to
+                    read!</p>
                 <p style="font-size: 18px">App Credits: Angella Jaden, Alan Park, Joy Lin, and CS4300 Course Staff</p>
                 <p style="font-size: 18px">Image Credits: https://www.muralsyourway.com/book-shop-mural/p</p>
                 <p style="font-size: 18px">https://www.deviantart.com/raeseddon2/art/Book-Store-951974713</p>
@@ -270,7 +324,8 @@
                 recommend
                 books
                 similar to it!</p>
-                <p class='book-description'> *Please note that some websites took down some book images so some results may display for "image not found" as the image. </p>
+            <p class='book-description'> *Please note that some websites took down some book images so some results may
+                display for "image not found" as the image. </p>
             <div class="input-box">
                 <img src="/static/images/mag.png" />
                 <i class="fas fa-search"></i>
@@ -301,12 +356,14 @@
                 <h1 id="google-3">B</h1>
             </div>
             <h3 class='book-version-title'>Version: Mood Input</h3>
-            <p class='book-description'>Type in the mood or theme of the book you're looking for! We'll recommend a book that aligns with your mood! Scroll down for results!</p>
-            <p class='book-description'>*Please note that some websites took down some book images so some results may display for "image not found" as the image. </p>
+            <p class='book-description'>Type in the mood or theme of the book you're looking for! We'll recommend a book
+                that aligns with your mood! Scroll down for results!</p>
+            <p class='book-description'>*Please note that some websites took down some book images so some results may
+                display for "image not found" as the image. </p>
             <div class="input-box">
                 <img src="{{ url_for('static', filename='images/mag.png' ) }}" />
                 <!-- adapted from https://dev.to/codingnepal/search-bar-with-autocomplete-search-suggestions-in-javascript-32dn -->
-                <input placeholder="Search by mood" id="mood-input"  maxlength="100"> 
+                <input placeholder="Search by mood" id="mood-input" maxlength="100">
             </div>
         </div>
         <div class="autocom-box-2">
@@ -333,7 +390,7 @@
                 resultBox.classList.add('active'); // show autocomplete box
                 showSuggestions2(emptyArray);
                 let allList = resultBox.querySelectorAll('ul');
-                
+
                 for (let i = 0; i < allList.length; i++) {
                     allList[i].setAttribute('onclick', 'select2(this)');
                 }
@@ -368,20 +425,31 @@
             title = (title !== "undefined") ? title : "There's no title.";
             authors = (authors !== "undefined") ? authors.replace(/^\[|\]$/g, '').replace(/^'(.*)'$/, "$1") : "There are no authors.";
             description = (description !== "undefined") ? description : "There's no description.";
-            score = (score !== undefined) ? score : "There's no review score"; 
-            count = (count !== undefined) ? count : "no"; 
+            score = (score !== undefined) ? score : "There's no review score";
+            count = (count !== undefined) ? count : "no";
+            const starRatingHtml = generateStarRating(score);
+
             return `
                 <div class='recommendation-container'>
                     <div class='book-details'>
                         <h3 class='book-title'>Title: ${title}</h3>
                         <p class='book-authors'>Authors: ${authors}</p>
                         <p class='book-description'>Description: ${description}</p>
-                        <p class='book-review-score-count'>Rating: ${score} based on ${count} reviews. </p>
+                        <p class='star-rating'>Rating: ${score} based on ${count} reviews. ${starRatingHtml}</p>
                         <p class='book-review-score-count'>Image link: <a href="${image}" target="_blank">Click to view</a></p>
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image' />
                 </div>`;
         };
+        function generateStarRating(score) {
+            const roundedScore = Math.round(score * 2) / 2; // Round the score to nearest half
+            const starPercentage = (roundedScore / 5) * 100; // Turn score into a percentage of 5 stars
+            // Use HTML character entities directly for the stars
+            const fullStars = '&starf;'.repeat(Math.floor(score)); // Filled stars
+            const halfStar = (roundedScore % 1 !== 0) ? '&star;' : ''; // Half star
+            const emptyStars = '&star;'.repeat(5 - Math.ceil(score)); // Empty stars
+            return fullStars + halfStar + emptyStars;
+        }
 
         function sendFocus2() {
             document.getElementById('mood-input').focus();
@@ -446,7 +514,7 @@
 
         // if user presses any key and releases
         inputBox.onkeyup = (e) => {
-            let userData = e.target.value; 
+            let userData = e.target.value;
             let emptyArray = [];
             if (userData) {
                 emptyArray = titles.filter((data) => {
@@ -455,14 +523,14 @@
                 emptyArray = emptyArray.map((data) => {
                     return `<ul>${data}</ul>`;
                 });
-                suggBox.classList.add('active'); 
+                suggBox.classList.add('active');
                 showSuggestions(emptyArray);
                 let allList = suggBox.querySelectorAll('ul');
                 for (let i = 0; i < allList.length; i++) {
                     allList[i].setAttribute('onclick', 'select(this)');
                 }
             } else {
-                suggBox.classList.remove('active'); 
+                suggBox.classList.remove('active');
             }
         };
 
@@ -491,13 +559,15 @@
         );
 
         function answerBoxTemplate(title, authors, categories, description, score, count, image) {
-                        //to make sure if any of these is undefined, to replace it with the following
+            //to make sure if any of these is undefined, to replace it with the following
             title = (title !== "undefined") ? title : "There's no title.";
             authors = (authors !== "undefined") ? authors.replace(/^\[|\]$/g, '').replace(/^'(.*)'$/, "$1") : "There are no authors.";
             categories = (categories !== "undefined") ? categories.replace(/^\[|\]$/g, '').replace(/\"/g, '') : "There are no categories.";
             description = (description !== "undefined") ? description : "There's no description.";
-            score = (score !== undefined) ? score : "There's no review score"; 
-            count = (count !== undefined) ? count : "no"; 
+            score = (score !== undefined) ? score : "There's no review score";
+            count = (count !== undefined) ? count : "no";
+            const starRatingHtml = generateStarRating(score);
+
             return `
                 <div class='recommendation-container'>
                     <div class='book-details'>
@@ -505,7 +575,7 @@
                         <p class='book-authors'>Authors: ${authors}</p>
                         <p class='book-categories'>Categories: ${categories}</p>
                         <p class='book-description'>Description: ${description}</p>
-                        <p class='book-review-score-count'>Rating: ${score.toFixed(2)} based on ${count} reviews.</p>
+                        <p class='star-rating'>Rating: ${score.toFixed(2)} based on ${count} reviews. ${starRatingHtml}</p>
                         <p class='book-review-score-count'>Image link: <a href="${image}" target="_blank">Click to view</a></p>
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image'/>
