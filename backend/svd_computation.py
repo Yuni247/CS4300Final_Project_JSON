@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import random
 from scipy.sparse.linalg import svds
 from sklearn.preprocessing import normalize
-import pickle
+
 
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
@@ -23,7 +23,7 @@ json_file_path = os.path.join(current_directory, 'init.json')
 
 # Assuming your JSON data is stored in a file named 'init.json'
 with open(json_file_path, 'r') as file:
-    data = pickle.load(file)
+    data = json.load(file)
     books_df = pd.DataFrame(data)
 
 # Create a TF-IDF vectorizer
