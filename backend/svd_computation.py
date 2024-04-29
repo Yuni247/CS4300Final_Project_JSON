@@ -40,15 +40,23 @@ words_compressed = words_compressed.transpose()
 word_to_index = vectorizer.vocabulary_
 index_to_word = {i:t for t,i in word_to_index.items()}
 
+# index_to_book = {i:t for t,i in enumerate(data)}
+# book_to_index = {t:i for t,i in enumerate(data)}
 # cosine similarity
 def closest_words(word_in, words_representation_in, k = 10):
-    if word_in not in word_to_index: return "Not in vocab."
+    if word_in not in word_to_index: 
+        guess = []
+        j = 0
+        while j < k+1:
+          rand = random.randint(0, len(word_to_index))
+          guess.append((rand, index_to_word[rand]))
+          j += 1
+        return [(ind, word, 0) for ind,word in guess]
     sims = words_representation_in.dot(words_representation_in[word_to_index[word_in],:])
     asort = np.argsort(-sims)[:k+1]
     return [(index_to_word[i],sims[i]) for i in asort[1:]]
 
 words_compressed_normed = normalize(words_compressed, axis = 1)
-
 docs_compressed_normed = normalize(docs_compressed)
 
 # this is basically the same cosine similarity code that we used before, just with some changes to
@@ -60,7 +68,14 @@ def closest_projects(project_index_in, project_repr_in, k = 5):
 
 # Once again, basically the same cosine similarity code, but mixing two different matrices
 def closest_projects_to_word(word_in, k = 5):
-    if word_in not in word_to_index: return "Not in vocab."
+    if word_in not in word_to_index: 
+        guess = []
+        j = 0
+        while j < k+1:
+          rand = random.randint(0, len(data))
+          guess.append((rand, data[rand]))
+          j += 1
+        return [(ind, book, 0) for ind,book in guess]
     sims = docs_compressed_normed.dot(words_compressed_normed[word_to_index[word_in],:])
     asort = np.argsort(-sims)[:k+1]
     return [(i, data[i],sims[i]) for i in asort[1:]]

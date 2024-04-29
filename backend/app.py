@@ -201,7 +201,7 @@ def books_search():
 @app.route("/mood")
 def preference_search():
     mood_interest = request.args.get("mood")  # Get the mood from query parameters
-    print(mood_interest)
+    #print(mood_interest)
     filtered_books = []
     for _, proj, _ in svd_computation.closest_projects_to_word(mood_interest):
         filtered_books.append(proj)
