@@ -7,7 +7,7 @@ import pandas as pd
 import Levenshtein as lev
 from cossim import * 
 from cossim import build_inverted_indexes
-from svd_computation import recommend_book
+import svd_computation
 
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
@@ -201,9 +201,20 @@ def books_search():
 @app.route("/mood")
 def preference_search():
     mood_interest = request.args.get("mood")  # Get the mood from query parameters
-    recommended_books = recommend_book(mood_interest)
-    rec_json = json.dumps(recommended_books)
-    return rec_json
-
+    print(mood_interest)
+    filtered_books = []
+    for _, proj, _ in svd_computation.closest_projects_to_word(mood_interest):
+        filtered_books.append(proj)
+    if filtered_books:
+        return json.dumps(filtered_books)
+    else:
+        other_words = svd_computation.closest_words(mood_interest)
+        i = 0
+        while i < 5:
+            for _, proj, _ in svd_computation.closest_projects_to_word(other_words[i]):
+                filtered_books.append(proj)
+        i += 1
+        return json.dumps(filtered_books)
+    
 if 'DB_NAME' not in os.environ:
     app.run(debug=True, host="0.0.0.0", port=5217)

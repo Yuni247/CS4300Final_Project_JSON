@@ -29,10 +29,10 @@ with open(json_file_path, 'r') as file:
 vectorizer =  TfidfVectorizer(max_df=.7)
 
 # Compute the TF-IDF matrix
-tfidf_matrix = vectorizer.fit_transform(x['descript'] for x in data)
+tfidf_matrix = vectorizer.fit_transform(x['descript'][:350] for x in data)
 
 # do SVD with a very large k (we usually use 100), just for the sake of getting many sorted singular values (aka importances)
-u, s, v_trans = svds(tfidf_matrix, k=100)
+#u, s, v_trans = svds(tfidf_matrix, k=100)
 
 docs_compressed, s, words_compressed = svds(tfidf_matrix, k=40)
 words_compressed = words_compressed.transpose()
@@ -72,9 +72,10 @@ def recommend_book(mood_interest):
   if filtered_books:
     return filtered_books
   else:
+    other_words = closest_words(mood_interest)
     i = 0
     while i < 5:
-      random_book = random.choice(data)
-      filtered_books.append(random_book)
+      for _, proj, _ in closest_projects_to_word(other_words[i]):
+        filtered_books.append(proj)
       i += 1
     return filtered_books

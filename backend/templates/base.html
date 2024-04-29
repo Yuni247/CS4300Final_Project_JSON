@@ -333,7 +333,7 @@
                 resultBox.classList.add('active'); // show autocomplete box
                 showSuggestions2(emptyArray);
                 let allList = resultBox.querySelectorAll('ul');
-                console.log(allList)
+                
                 for (let i = 0; i < allList.length; i++) {
                     allList[i].setAttribute('onclick', 'select2(this)');
                 }
@@ -389,17 +389,17 @@
 
 
         function showMood() {
-            console.log("inside showmood")
+            // console.log("inside showmood")
             const answerBox = document.getElementById('answer-box-2');
             answerBox.innerHTML = '';
-            interest = input.value;
+            interest = input.value.trim();
             if (interest.trim() !== '') {
-                fetch("/mood?" + new URLSearchParams({ mood: interest.value }))
+                fetch("/mood?" + new URLSearchParams({ mood: interest }).toString())
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(book => {
                             const bookDivClass = document.createElement('div');
-                            console.log("the rec book is "+book);
+                            // console.log("the rec book is "+book);
                             bookDivClass.innerHTML = answerBox2(book.Title, book.authors, book.descript, book.review_score, book.review_count, book.image);
                             answerBox.appendChild(bookDivClass);
                         });
