@@ -30,7 +30,7 @@ with open(json_file_path, 'r') as file:
 vectorizer =  TfidfVectorizer(max_df=.7)
 
 # Compute the TF-IDF matrix
-tfidf_matrix = vectorizer.fit_transform(x['descript'] for x in data)
+tfidf_matrix = vectorizer.fit_transform(x['descript'][:250] for x in data)
 
 # do SVD with a very large k (we usually use 100), just for the sake of getting many sorted singular values (aka importances)
 #u, s, v_trans = svds(tfidf_matrix, k=100)
