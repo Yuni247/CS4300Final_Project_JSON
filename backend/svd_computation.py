@@ -10,6 +10,7 @@ import random
 from scipy.sparse.linalg import svds
 from sklearn.preprocessing import normalize
 
+
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
 os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
