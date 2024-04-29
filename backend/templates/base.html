@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title> - Book Hub</title>
+    <title> Book Hub</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -292,8 +292,8 @@
                 <p style="font-size: 0.8em;">The word you input is matched against the descriptions of the books in the
                     database by an SVD computation.
                     <br>This search emphasizes the words in the description of the book to determine the book that would
-                    fit the free form input word a user gives it.<br>
-                    <br><br>
+                    fit the free form input word a user gives it. There is also an output on the similarity of this word in relation to the descriptions of the books in the output to show how the suggestions were made<br>
+                    <br>In the case that the Word you input is not part of the vocabulary then you will a bunch of random books with a score of 0<br>
                 </p>
                 <p style="font-size: 18px">Thank you for visiting our Book Hub. We hope you find something great to
                     read!</p>
@@ -419,7 +419,7 @@
         };
 
 
-        function answerBox2(title, authors, description, score, count, image) {
+        function answerBox2(title, authors, description, score, count, image, simscore) {
             //to make sure if any of these is undefined, to replace it with the following
             //rid the quotes
             title = (title !== "undefined") ? title : "There's no title.";
@@ -436,6 +436,7 @@
                         <p class='book-authors'>Authors: ${authors}</p>
                         <p class='book-description'>Description: ${description}</p>
                         <p class='book-review-score-count'>Rating: ${score.toFixed(2)} based on ${count} reviews. </p>
+                        <p class='book-sim-score'>Similarity Score: ${simscore.toFixed(2)}  </p>
                         <p class='book-review-score-count'>Image link: <a href="${image}" target="_blank">Click to view</a></p>
                     </div>
                     <img src="${image}" alt="Book cover" class='book-image' />
@@ -468,7 +469,7 @@
                         data.forEach(book => {
                             const bookDivClass = document.createElement('div');
                             // console.log("the rec book is "+book);
-                            bookDivClass.innerHTML = answerBox2(book.Title, book.authors, book.descript, book.review_score, book.review_count, book.image);
+                            bookDivClass.innerHTML = answerBox2(book[0].Title, book[0].authors, book[0].descript, book[0].review_score, book[0].review_count, book[0].image, book[1]);
                             answerBox.appendChild(bookDivClass);
                         });
                     })

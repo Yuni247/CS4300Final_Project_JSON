@@ -29,7 +29,7 @@ with open(json_file_path, 'r') as file:
 vectorizer =  TfidfVectorizer(max_df=.7)
 
 # Compute the TF-IDF matrix
-tfidf_matrix = vectorizer.fit_transform(x['descript'][:350] for x in data)
+tfidf_matrix = vectorizer.fit_transform(x['descript'] for x in data)
 
 # do SVD with a very large k (we usually use 100), just for the sake of getting many sorted singular values (aka importances)
 #u, s, v_trans = svds(tfidf_matrix, k=100)
@@ -51,6 +51,7 @@ def closest_words(word_in, words_representation_in, k = 10):
           rand = random.randint(0, len(word_to_index))
           guess.append((rand, index_to_word[rand]))
           j += 1
+          #print("randomW")
         return [(ind, word, 0) for ind,word in guess]
     sims = words_representation_in.dot(words_representation_in[word_to_index[word_in],:])
     asort = np.argsort(-sims)[:k+1]
@@ -68,6 +69,7 @@ def closest_projects(project_index_in, project_repr_in, k = 5):
 
 # Once again, basically the same cosine similarity code, but mixing two different matrices
 def closest_projects_to_word(word_in, k = 5):
+    #print(word_in)
     if word_in not in word_to_index: 
         guess = []
         j = 0
