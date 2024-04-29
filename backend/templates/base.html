@@ -292,8 +292,10 @@
                 <p style="font-size: 0.8em;">The word you input is matched against the descriptions of the books in the
                     database by an SVD computation.
                     <br>This search emphasizes the words in the description of the book to determine the book that would
-                    fit the free form input word a user gives it. There is also an output on the similarity of this word in relation to the descriptions of the books in the output to show how the suggestions were made<br>
-                    <br>In the case that the Word you input is not part of the vocabulary then you will a bunch of random books with a score of 0<br>
+                    fit the free form input word a user gives it. There is also an output on the similarity of this word
+                    in relation to the descriptions of the books in the output to show how the suggestions were made<br>
+                    <br>In the case that the Word you input is not part of the vocabulary then you will a bunch of
+                    random books with a score of 0<br>
                 </p>
                 <p style="font-size: 18px">Thank you for visiting our Book Hub. We hope you find something great to
                     read!</p>
@@ -435,7 +437,7 @@
                         <h3 class='book-title'>Title: ${title}</h3>
                         <p class='book-authors'>Authors: ${authors}</p>
                         <p class='book-description'>Description: ${description}</p>
-                        <p class='book-review-score-count'>Rating: ${score.toFixed(2)} based on ${count} reviews. </p>
+                        <p class='star-rating'>Rating: ${score.toFixed(2)} based on ${count} reviews. ${starRatingHtml}</p>
                         <p class='book-sim-score'>Similarity Score: ${simscore.toFixed(2)}  </p>
                         <p class='book-review-score-count'>Image link: <a href="${image}" target="_blank">Click to view</a></p>
                     </div>
@@ -443,14 +445,23 @@
                 </div>`;
         };
         function generateStarRating(score) {
-            const roundedScore = Math.round(score * 2) / 2; // Round the score to nearest half
-            const starPercentage = (roundedScore / 5) * 100; // Turn score into a percentage of 5 stars
-            // Use HTML character entities directly for the stars
-            const fullStars = '&starf;'.repeat(Math.floor(score)); // Filled stars
-            const halfStar = (roundedScore % 1 !== 0) ? '&star;' : ''; // Half star
-            const emptyStars = '&star;'.repeat(5 - Math.ceil(score)); // Empty stars
-            return fullStars + halfStar + emptyStars;
+            // Round the score to the nearest whole number
+            let roundedScore = Math.round(score);
+            let starsHtml = '';
+
+            // Add full stars to HTML
+            for (let i = 0; i < roundedScore; i++) {
+                starsHtml += '&#9733;'; // HTML entity for a full star
+            }
+
+            // Add empty stars for the remainder to make up to 5 stars
+            for (let i = roundedScore; i < 5; i++) {
+                starsHtml += '&#9734;'; // HTML entity for an empty star
+            }
+
+            return starsHtml;
         }
+
 
         function sendFocus2() {
             document.getElementById('mood-input').focus();
