@@ -205,20 +205,19 @@ def preference_search():
     #print(mood_interest)
     filtered_books = []
     for _, proj, sim in svd_computation.closest_projects_to_word(mood_interest.lower()):
-        json_data = proj.to_dict()
-        filtered_books.append((json_data,sim*100))
+        #print("notrand")
+        filtered_books.append((proj,sim*100))
     if filtered_books!=[]:
         return json.dumps(filtered_books)
     else:
-        other_words = svd_computation.closest_words(mood_interest.lower())
+        other_words = svd_computation.closest_words(mood_interest)
         #print(other_words)
         i = 0
         while i < 5:
             for _, proj, _ in svd_computation.closest_projects_to_word(other_words[i]):
-                json_data = proj.to_dict()
-                filtered_books.append((json_data,0))
+                filtered_books.append((proj,0))
         i += 1
-        return (filtered_books)
+        return json.dumps(filtered_books)
     
 if 'DB_NAME' not in os.environ:
     app.run(debug=True, host="0.0.0.0", port=5217)

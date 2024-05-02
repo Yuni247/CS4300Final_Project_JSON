@@ -19,16 +19,19 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
 # Specify the path to the JSON file relative to the current script
-# Specify the path to the JSON file relative to the current script
 json_file_path = os.path.join(current_directory, 'init.json')
-data = pd.read_json(json_file_path)
-books_df = pd.DataFrame(data)
+
+# Assuming your JSON data is stored in a file named 'init.json'
+with open(json_file_path, 'r') as file:
+    data = json.load(file)
+    books_df = pd.DataFrame(data)
 
 # Create a TF-IDF vectorizer
 vectorizer =  TfidfVectorizer(max_df=.7)
 
 # Compute the TF-IDF matrix
-tfidf_matrix = vectorizer.fit_transform(data['descript'])
+tfidf_matrix = vectorizer.fit_transform(x['descript'] for x in data)
+
 # do SVD with a very large k (we usually use 100), just for the sake of getting many sorted singular values (aka importances)
 #u, s, v_trans = svds(tfidf_matrix, k=100)
 
@@ -63,7 +66,7 @@ docs_compressed_normed = normalize(docs_compressed)
 def closest_projects(project_index_in, project_repr_in, k = 5):
     sims = project_repr_in.dot(project_repr_in[project_index_in,:])
     asort = np.argsort(-sims)[:k+1]
-    return [(data.loc[i],sims[i]) for i in asort[1:]]
+    return [(data[i],sims[i]) for i in asort[1:]]
 
 # Once again, basically the same cosine similarity code, but mixing two different matrices
 def closest_projects_to_word(word_in, k = 5):
@@ -73,12 +76,12 @@ def closest_projects_to_word(word_in, k = 5):
         j = 0
         while j < k+1:
           rand = random.randint(0, len(data))
-          guess.append((rand, data.loc[rand]))
+          guess.append((rand, data[rand]))
           j += 1
         return [(ind, book, 0) for ind,book in guess]
     sims = docs_compressed_normed.dot(words_compressed_normed[word_to_index[word_in],:])
     asort = np.argsort(-sims)[:k+1]
-    return [(i, data.loc[i],sims[i]) for i in asort[1:]]
+    return [(i, data[i],sims[i]) for i in asort[1:]]
 
 def recommend_book(mood_interest):
   filtered_books = []
