@@ -8,6 +8,9 @@ import Levenshtein as lev
 from cossim import * 
 from cossim import build_inverted_indexes
 import svd_computation
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
@@ -201,23 +204,28 @@ def books_search():
 
 @app.route("/mood")
 def preference_search():
-    mood_interest = request.args.get("mood")  # Get the mood from query parameters
-    #print(mood_interest)
-    filtered_books = []
-    for _, proj, sim in svd_computation.closest_projects_to_word(mood_interest.lower()):
-        #print("notrand")
-        filtered_books.append((proj,sim*100))
-    if filtered_books!=[]:
-        return json.dumps(filtered_books)
-    else:
-        other_words = svd_computation.closest_words(mood_interest)
-        #print(other_words)
-        i = 0
-        while i < 5:
-            for _, proj, _ in svd_computation.closest_projects_to_word(other_words[i]):
-                filtered_books.append((proj,0))
-        i += 1
-        return json.dumps(filtered_books)
+    user_input = request.args.get("mood")  # Get the mood from query parameters
+    
+    user_tfidf_vector = svd_computation.vectorizer.transform([user_input.lower()])
+    svd = TruncatedSVD(n_components=40)
+    svd.fit(svd_computation.tfidf_matrix)
+    
+    user_mood_vector_reduced = svd.transform(user_tfidf_vector)
+    top_k = 10
+     
+    cosine_similarities = cosine_similarity(user_mood_vector_reduced, svd_computation.docs_compressed.dot(np.diag(svd_computation.s)))
+
+    top_matches_indices = np.argsort(cosine_similarities, axis=1)[0, ::-1][:top_k]
+    top_cosine_similarities = cosine_similarities[0, top_matches_indices]
+
+    top_matching_books = [(svd_computation.data[index], similarity) for index, similarity in zip(top_matches_indices, top_cosine_similarities)]
+
+    return json.dumps(top_matching_books)
+
+    
+if 'DB_NAME' not in os.environ:
+    app.run(debug=True, host="0.0.0.0", port=5217)
+
     
 if 'DB_NAME' not in os.environ:
     app.run(debug=True, host="0.0.0.0", port=5217)
