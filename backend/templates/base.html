@@ -322,12 +322,11 @@
                 <h1 id="google-3">B</h1>
             </div>
             <h3 class='book-version-title'>Version: Book Title Input</h3>
-            <p class='book-description'>Start typing in the title of a book you've already read. Click an option in the dropdown and press "Enter"--we'll
-                recommend
-                books
-                similar to it!</p>
-            <p class='book-description'> *Please note that some websites took down some book images so some results may
-                display for "image not found" as the image. </p>
+            <p class='book-description'>Start typing in the title of a book you've already read. Click an option in the
+                dropdown and press "Enter"--we'll
+                recommend books similar to it!</p>
+            <p class='book-description'>*Please note that some websites took down some book images so some results may
+                display for "image not found" as the image.</p>
             <div class="input-box">
                 <img src="/static/images/mag.png" />
                 <i class="fas fa-search"></i>
@@ -335,15 +334,20 @@
                 <div class="wrapper">
                     <div class="search-input">
                         <a href="" target="_blank" hidden></a>
-                        <input id="" type="text" placeholder="Search for your next read..." />
+                        <input type="text" placeholder="Search for your next read..." />
                     </div>
                 </div>
+            </div>
+            <!-- New div for displaying weights description -->
+            <div id="weights-info" style="margin-top: 20px;">
+                <!-- Weights information will be displayed here -->
             </div>
         </div>
         <div class="autocom-box">
         </div>
         <div id="answer-box"> </div>
     </div>
+
     <!-- This is for the SVD search page -->
     <div class="full-body-container-2" style="display: none;">
         <button onclick="showIntroduction()">Go back to main page</button>
@@ -359,8 +363,9 @@
             </div>
             <h3 class='book-version-title'>Version: Mood Input</h3>
             <p class='book-description'>Type in the mood/theme of the book you're looking for! <br>
-                If this mood/theme is in our DB, there will be a long dropdown list, and 
-                if the mood/theme isn't in our DB, the list will only contain this one mood/theme in the dropdown. Whichever situation it is, make sure to click the mood/theme in the dropdown and then press enter! 
+                If this mood/theme is in our DB, there will be a long dropdown list, and
+                if the mood/theme isn't in our DB, the list will only contain this one mood/theme in the dropdown.
+                Whichever situation it is, make sure to click the mood/theme in the dropdown and then press enter!
                 We'll recommend a book
                 that aligns with your mood! Scroll down for results!</p>
             <p class='book-description'>*Please note that some websites took down some book images so some results may
@@ -613,18 +618,41 @@
 
             if (searchText !== "") {
                 fetch("/books?" + new URLSearchParams({ title: searchText }).toString())
-                    .then((response) => response.json())
-                    .then((data) => {
-                        let output_div = document.getElementById("answer-box")
-                        document.getElementById("answer-box").innerHTML = "";
-                        data.slice(0, 10).forEach(row => {
-                            let tempDiv = document.createElement("div");
-                            tempDiv.innerHTML = answerBoxTemplate(row.Title, row.authors, row.categories, row.descript, row.review_score, row.review_count, row.image);
-                            document.getElementById("answer-box").appendChild(tempDiv);
-                        });
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data); // This can be removed once you confirm data is as expected
+                        document.getElementById("weights-info").textContent = data.weights_description; // Update the weights information
+
+                        let output_div = document.getElementById("answer-box");
+                        output_div.innerHTML = ""; // Clear previous results
+                        // Ensure that data.books exists and is an array
+                        if (data.books && data.books.length > 0) {
+                            data.books.forEach(book => {
+                                let tempDiv = document.createElement("div");
+                                tempDiv.innerHTML = answerBoxTemplate(
+                                    book.Title,
+                                    book.authors,
+                                    book.categories,
+                                    book.descript,
+                                    book.review_score,
+                                    book.review_count,
+                                    book.image
+                                );
+                                output_div.appendChild(tempDiv);
+                            });
+                        } else {
+                            // Handle the case where no books are returned
+                            output_div.textContent = "No books found.";
+                        }
+                    }).catch(error => {
+                        console.error('Error fetching data:', error);
+                        document.getElementById("answer-box").textContent = "Error fetching books.";
                     });
             }
-        };
+        }
+
+
+
     </script>
 
 </body>
