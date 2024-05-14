@@ -80,48 +80,44 @@
             font-size: 24px;
             line-height: 1;
             display: inline-block;
+            /* Keep the star rating in line with other inline elements */
             position: relative;
+            /* Establish a positioning context for absolute children */
             height: 24px;
+            /* Make this the same height as your stars */
         }
 
         .star-rating .full-stars,
         .star-rating .empty-stars {
             display: block;
+            /* Use block here to fill the container */
             position: absolute;
+            /* Position them in the container */
             top: 0;
             left: 0;
             white-space: nowrap;
+            /* No wrapping to a new line */
         }
 
         .star-rating .empty-stars::before {
             content: "\u2606\u2606\u2606\u2606\u2606";
+            /* Five outlined stars */
             color: #ccc;
+            /* Light gray color */
             z-index: 0;
         }
 
         .star-rating .full-stars::before {
             content: "\u2605\u2605\u2605\u2605\u2605";
+            /* Five filled stars */
             color: orange;
+            /* Orange color */
             width: 0;
+            /* This will be set dynamically */
             z-index: 1;
             overflow: hidden;
+            /* To hide the overflowing stars */
         }
-
-        .autocom-box {
-            z-index: 1000;
-            position: relative;
-        }
-
-        #weights-info {
-            position: absolute;
-            top: 500px;
-            left: 0;
-            width: 100%;
-            z-index: 1;
-            font-family: 'Kanit', sans-serif;
-            font-weight: bold;
-        }
-
 
         .full-body-container,
         .full-body-container-2,
@@ -263,6 +259,18 @@
         .scroll {
             font-size: 18px;
         }
+
+        .loading-message {
+            display: none;
+            position: absolute;
+            top: 100%; 
+            left: 50%;
+            transform: translate(-50%, -100px);
+            font-size: 15px;
+            padding: 5px 15px;
+            border-radius: 5px;
+            z-index: 1000; 
+        }
     </style>
 </head>
 
@@ -315,7 +323,7 @@
     <!-- This is for the search page based on favorite book -->
     <div class="full-body-container" style="display: none;">
         <button onclick="showIntroduction()">Go back to main page</button>
-        <div class="top-text">
+        <div class="top-text" style="position: relative;">
             <div class="google-colors">
                 <h1 id="google-1">B</h1>
                 <h1 id="google-2">O</h1>
@@ -342,20 +350,18 @@
                     </div>
                 </div>
             </div>
-            <!-- New div for displaying weights description -->
             <div id="weights-info" style="margin-top: 20px;">
-                <!-- Weights information will be displayed here -->
             </div>
         </div>
-        <div class="autocom-box">
-        </div>
+        <div class="autocom-box"></div>
+        <div id="loading" class="loading-message" style="display: none; font-size: 20px; color: rgb(38, 0, 255);">Loading...</div>
         <div id="answer-box"> </div>
     </div>
 
     <!-- This is for the SVD search page -->
     <div class="full-body-container-2" style="display: none;">
         <button onclick="showIntroduction()">Go back to main page</button>
-        <div class="top-text">
+        <div class="top-text" style="position: relative;">
             <div class="google-colors">
                 <h1 id="google-1">B</h1>
                 <h1 id="google-2">O</h1>
@@ -380,15 +386,30 @@
                 <input placeholder="Search by mood" id="mood-input" maxlength="100">
             </div>
         </div>
-        <div class="autocom-box-2">
-        </div>
+        <div class="autocom-box-2"></div>
+        <div id="loading-2" class="loading-message" style="display: none; font-size: 20px; color: rgb(38, 0, 255);">Loading...</div>
         <div id="answer-box-2"> </div>
     </div>
     <script src="../static/books_titles.js"></script>
     <script src="../static/moods.js"></script>
 
     <script>
+        let loadingInterval; 
 
+        function startLoadingAnimation(elementId) {
+            let dotCount = 0;
+            document.getElementById(elementId).style.display = "block";
+            loadingInterval = setInterval(() => {
+                dotCount = (dotCount + 1) % 4; 
+                let dots = ".".repeat(dotCount); 
+                document.getElementById(elementId).textContent = "Loading" + dots; 
+            }, 500); 
+        }
+
+        function stopLoadingAnimation(elementId) {
+            clearInterval(loadingInterval); 
+            document.getElementById(elementId).style.display = "none"; 
+        }
         const resultBox = document.querySelector('.autocom-box-2');
         const input = document.getElementById('mood-input');
         input.onkeyup = (e) => {
@@ -481,7 +502,7 @@
 
 
         function showMood() {
-            // console.log("inside showmood")
+            startLoadingAnimation("loading-2");
             const answerBox = document.getElementById('answer-box-2');
             answerBox.innerHTML = '';
             interest = input.value.trim();
@@ -489,9 +510,9 @@
                 fetch("/mood?" + new URLSearchParams({ mood: interest }).toString())
                     .then(response => response.json())
                     .then(data => {
+                        stopLoadingAnimation("loading-2");
                         data.forEach(book => {
                             const bookDivClass = document.createElement('div');
-                            // console.log("the rec book is "+book);
                             bookDivClass.innerHTML = answerBox2(book[0].Title, book[0].authors, book[0].descript, book[0].review_score, book[0].review_count, book[0].image, book[1]);
                             answerBox.appendChild(bookDivClass);
                         });
@@ -584,10 +605,10 @@
 
         function answerBoxTemplate(title, authors, categories, description, score, count, image) {
             //to make sure if any of these is undefined, to replace it with the following
-            title = (title !== "null") ? title : "There's no title.";
-            authors = (authors !== "null") ? authors.replace(/^\[|\]$/g, '').replace(/^'(.*)'$/, "$1") : "There are no authors.";
-            categories = (categories !== "null") ? categories.replace(/^\[|\]$/g, '').replace(/\"/g, '') : "There are no categories.";
-            description = (description !== "null") ? description : "There's no description.";
+            title = (title !== "undefined") ? title : "There's no title.";
+            authors = (authors !== "undefined") ? authors.replace(/^\[|\]$/g, '').replace(/^'(.*)'$/, "$1") : "There are no authors.";
+            categories = (categories !== "undefined") ? categories.replace(/^\[|\]$/g, '').replace(/\"/g, '') : "There are no categories.";
+            description = (description !== "undefined") ? description : "There's no description.";
             score = (score !== undefined) ? score : "There's no review score";
             count = (count !== undefined) ? count : "no";
             const starRatingHtml = generateStarRating(score);
@@ -612,6 +633,7 @@
         };
 
         function query() {
+            startLoadingAnimation("loading");
             searchWrapper.classList.remove('active');
 
             let searchParams = new URLSearchParams();
@@ -624,23 +646,13 @@
                 fetch("/books?" + new URLSearchParams({ title: searchText }).toString())
                     .then(response => response.json())
                     .then(data => {
-                        let output_div = document.getElementById("answer-box");
-                        output_div.innerHTML = ""; // Clear previous results
+                        stopLoadingAnimation("loading");
+                        document.getElementById("weights-info").textContent = data.weights_description; // Update the weights information
 
-                        let additionalInfo = [];
+                        let output_div = document.getElementById("answer-box");
+                        output_div.innerHTML = ""; 
                         if (data.books && data.books.length > 0) {
                             data.books.forEach(book => {
-                                // Check for null attributes and modify weights description accordingly
-                                if (book.authors === "null" && book.descript !== "null") {
-                                    additionalInfo.push("Input book had no authors.");
-                                }
-                                if (book.descript === "null" && book.authors !== "null") {
-                                    additionalInfo.push("Input book had no description.");
-                                }
-                                if (book.descript === "null" && book.descript === "null") {
-                                    additionalInfo.push("Input book had no description and authors.");
-                                }
-
                                 let tempDiv = document.createElement("div");
                                 tempDiv.innerHTML = answerBoxTemplate(
                                     book.Title,
@@ -654,78 +666,16 @@
                                 output_div.appendChild(tempDiv);
                             });
                         } else {
+                            // Handle the case where no books are returned
                             output_div.textContent = "No books found.";
                         }
-
-                        // Update weights info with additional messages about null attributes
-                        document.getElementById("weights-info").textContent = data.weights_description +
-                            (additionalInfo.length > 0 ? " Also, " + additionalInfo.join(" ") : "");
-                    })
-                    .catch(error => {
+                    }).catch(error => {
                         console.error('Error fetching data:', error);
                         document.getElementById("answer-box").textContent = "Error fetching books.";
+                        loadingElement.style.display = "none";
                     });
             }
         }
-        function query() {
-            searchWrapper.classList.remove('active');
-
-            let searchParams = new URLSearchParams();
-            searchParams.append('title', inputBox.value);
-
-            let searchText = inputBox.value.trim();
-            suggBox.innerHTML = "";
-
-            if (searchText !== "") {
-                fetch("/books?" + new URLSearchParams({ title: searchText }).toString())
-                    .then(response => response.json())
-                    .then(data => {
-                        let output_div = document.getElementById("answer-box");
-                        output_div.innerHTML = ""; // Clear previous results
-
-                        let nullMessages = [];
-
-                        // Check each book for null attributes and prepare messages
-                        data.books.forEach(book => {
-                            let messageParts = [];
-                            if (book.authors === "null") {
-                                messageParts.push("no authors");
-                            }
-                            if (book.categories === "null") {
-                                messageParts.push("no categories");
-                            }
-                            if (book.descript === "null") {
-                                messageParts.push("no description");
-                            }
-
-                            if (messageParts.length > 0) {
-                                nullMessages.push(`Input book had ${messageParts.join(", ")}.`);
-                            }
-
-                            let tempDiv = document.createElement("div");
-                            tempDiv.innerHTML = answerBoxTemplate(
-                                book.Title,
-                                book.authors,
-                                book.categories,
-                                book.descript,
-                                book.review_score,
-                                book.review_count,
-                                book.image
-                            );
-                            output_div.appendChild(tempDiv);
-                        });
-
-                        // If there are null attribute messages, append them to the weights description
-                        let weightsInfo = data.weights_description + (nullMessages.length > 0 ? " Also, " + nullMessages.join(" ") : "");
-                        document.getElementById("weights-info").textContent = weightsInfo;
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        document.getElementById("answer-box").textContent = "Error fetching books.";
-                    });
-            }
-        }
-
 
 
 
