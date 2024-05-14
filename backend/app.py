@@ -164,35 +164,42 @@ def books_search():
         for title, score in categories_list:
             combined_scores[title] = combined_scores.get(title, 0) + (score / avg_categories_score) * categories_weight
     
-    weights_description = ""
+    # weight if authors = "null": (author, descript, categories: 0.0, 0.3, 0.7)
     if book_row["authors"] == "null" and book_row["descript"] != "null":
         avg_weighter(0, 3, 7)
-        weights_description = "Weights: Authors 0.0, Description 0.3, Categories 0.7"
+    # weight if descript = "null": (author, descript, categories: 0.55, 0.0, 0.45)
     elif book_row["descript"] == "null" and book_row["authors"] != "null":
         avg_weighter(5.5, 0, 4.5)
-        weights_description = "Weights: Authors 0.55, Description 0.0, Categories 0.45"
+    # weight if both authors and descript = "null": (author, descript, categories: 0.0, 0.0, 1.0)
     elif book_row["descript"] == "null" and book_row["descript"] == "null":
         avg_weighter(0, 0, 10)
-        weights_description = "Weights: Authors 0.0, Description 0.0, Categories 1.0"
+    # normal weights: (author, descript, categories: 0.45, 0.2, 0.35)
     else:
         avg_weighter(4.5, 2, 3.5)
-        weights_description = "Weights: Authors 0.45, Description 0.2, Categories 0.35"
 
-    # Calculate and prepare the final DataFrame for JSON conversion
-    combined_list = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
-    combined_list = [item for item in combined_list if item[0] != book_row["Title"]]
+    
+    # Convert the dictionary to a sorted list of tuples
+    combined_list = sorted(combined_scores.items(), key=lambda x: x[0], reverse=True)
+    for result in combined_list:
+        if result[0] == book_row["Title"]:
+            combined_list.remove(result)
 
-    combined_df = pd.DataFrame(combined_list, columns=['Title', 'cossim_score'])
+    combined_df = pd.DataFrame(combined_list, columns=[ 'Title', 'cossim_score'])
+    combined_df['Title'], books_df['Title'] = combined_df['Title'].astype(str), books_df['Title'].astype(str)
+
     final_df = pd.merge(combined_df, books_df[['Title', 'authors', 'categories', 'descript', 'review_score', 'review_count', 'image']], on='Title', how='left')
+    
+    # sort the final df by the cossim scores, take only the top 10
     top_recs = final_df.sort_values(by='cossim_score', ascending=False).head(10)
+
+    # review_score and review_count ranking system added
     top_recs['Weighted_Score'] = top_recs['review_score'] + np.log(top_recs['review_count'])
     top_recs_w_reviews = top_recs.sort_values(by='Weighted_Score', ascending=False)
+
     top_recs_w_reviews['cossim_score'], top_recs_w_reviews['Weighted_Score'] = top_recs_w_reviews['cossim_score'].round(2), top_recs_w_reviews['Weighted_Score'].round(2)
-    
-    # Manually constructing a JSON string that includes the weights description
-    books_json = top_recs_w_reviews.to_json(orient='records')
-    response_json = f'{{"books": {books_json}, "weights_description": "{weights_description}"}}'
-    return response_json
+
+    top_recs_json = top_recs_w_reviews.to_json(orient='records')
+    return top_recs_json
 
 
 @app.route("/mood")
