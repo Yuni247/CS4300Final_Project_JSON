@@ -80,44 +80,48 @@
             font-size: 24px;
             line-height: 1;
             display: inline-block;
-            /* Keep the star rating in line with other inline elements */
             position: relative;
-            /* Establish a positioning context for absolute children */
             height: 24px;
-            /* Make this the same height as your stars */
         }
 
         .star-rating .full-stars,
         .star-rating .empty-stars {
             display: block;
-            /* Use block here to fill the container */
             position: absolute;
-            /* Position them in the container */
             top: 0;
             left: 0;
             white-space: nowrap;
-            /* No wrapping to a new line */
         }
 
         .star-rating .empty-stars::before {
             content: "\u2606\u2606\u2606\u2606\u2606";
-            /* Five outlined stars */
             color: #ccc;
-            /* Light gray color */
             z-index: 0;
         }
 
         .star-rating .full-stars::before {
             content: "\u2605\u2605\u2605\u2605\u2605";
-            /* Five filled stars */
             color: orange;
-            /* Orange color */
             width: 0;
-            /* This will be set dynamically */
             z-index: 1;
             overflow: hidden;
-            /* To hide the overflowing stars */
         }
+
+        .autocom-box {
+            z-index: 1000;
+            position: relative;
+        }
+
+        #weights-info {
+            position: absolute;
+            top: 500px;
+            left: 0;
+            width: 100%;
+            z-index: 1;
+            font-family: 'Kanit', sans-serif;
+            font-weight: bold;
+        }
+
 
         .full-body-container,
         .full-body-container-2,
@@ -580,10 +584,10 @@
 
         function answerBoxTemplate(title, authors, categories, description, score, count, image) {
             //to make sure if any of these is undefined, to replace it with the following
-            title = (title !== "undefined") ? title : "There's no title.";
-            authors = (authors !== "undefined") ? authors.replace(/^\[|\]$/g, '').replace(/^'(.*)'$/, "$1") : "There are no authors.";
-            categories = (categories !== "undefined") ? categories.replace(/^\[|\]$/g, '').replace(/\"/g, '') : "There are no categories.";
-            description = (description !== "undefined") ? description : "There's no description.";
+            title = (title !== "null") ? title : "There's no title.";
+            authors = (authors !== "null") ? authors.replace(/^\[|\]$/g, '').replace(/^'(.*)'$/, "$1") : "There are no authors.";
+            categories = (categories !== "null") ? categories.replace(/^\[|\]$/g, '').replace(/\"/g, '') : "There are no categories.";
+            description = (description !== "null") ? description : "There's no description.";
             score = (score !== undefined) ? score : "There's no review score";
             count = (count !== undefined) ? count : "no";
             const starRatingHtml = generateStarRating(score);
@@ -620,14 +624,23 @@
                 fetch("/books?" + new URLSearchParams({ title: searchText }).toString())
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data); // This can be removed once you confirm data is as expected
-                        document.getElementById("weights-info").textContent = data.weights_description; // Update the weights information
-
                         let output_div = document.getElementById("answer-box");
                         output_div.innerHTML = ""; // Clear previous results
-                        // Ensure that data.books exists and is an array
+
+                        let additionalInfo = [];
                         if (data.books && data.books.length > 0) {
                             data.books.forEach(book => {
+                                // Check for null attributes and modify weights description accordingly
+                                if (book.authors === "null" && book.descript !== "null") {
+                                    additionalInfo.push("Input book had no authors.");
+                                }
+                                if (book.descript === "null" && book.authors !== "null") {
+                                    additionalInfo.push("Input book had no description.");
+                                }
+                                if (book.descript === "null" && book.descript === "null") {
+                                    additionalInfo.push("Input book had no description and authors.");
+                                }
+
                                 let tempDiv = document.createElement("div");
                                 tempDiv.innerHTML = answerBoxTemplate(
                                     book.Title,
@@ -641,15 +654,78 @@
                                 output_div.appendChild(tempDiv);
                             });
                         } else {
-                            // Handle the case where no books are returned
                             output_div.textContent = "No books found.";
                         }
-                    }).catch(error => {
+
+                        // Update weights info with additional messages about null attributes
+                        document.getElementById("weights-info").textContent = data.weights_description +
+                            (additionalInfo.length > 0 ? " Also, " + additionalInfo.join(" ") : "");
+                    })
+                    .catch(error => {
                         console.error('Error fetching data:', error);
                         document.getElementById("answer-box").textContent = "Error fetching books.";
                     });
             }
         }
+        function query() {
+            searchWrapper.classList.remove('active');
+
+            let searchParams = new URLSearchParams();
+            searchParams.append('title', inputBox.value);
+
+            let searchText = inputBox.value.trim();
+            suggBox.innerHTML = "";
+
+            if (searchText !== "") {
+                fetch("/books?" + new URLSearchParams({ title: searchText }).toString())
+                    .then(response => response.json())
+                    .then(data => {
+                        let output_div = document.getElementById("answer-box");
+                        output_div.innerHTML = ""; // Clear previous results
+
+                        let nullMessages = [];
+
+                        // Check each book for null attributes and prepare messages
+                        data.books.forEach(book => {
+                            let messageParts = [];
+                            if (book.authors === "null") {
+                                messageParts.push("no authors");
+                            }
+                            if (book.categories === "null") {
+                                messageParts.push("no categories");
+                            }
+                            if (book.descript === "null") {
+                                messageParts.push("no description");
+                            }
+
+                            if (messageParts.length > 0) {
+                                nullMessages.push(`Input book had ${messageParts.join(", ")}.`);
+                            }
+
+                            let tempDiv = document.createElement("div");
+                            tempDiv.innerHTML = answerBoxTemplate(
+                                book.Title,
+                                book.authors,
+                                book.categories,
+                                book.descript,
+                                book.review_score,
+                                book.review_count,
+                                book.image
+                            );
+                            output_div.appendChild(tempDiv);
+                        });
+
+                        // If there are null attribute messages, append them to the weights description
+                        let weightsInfo = data.weights_description + (nullMessages.length > 0 ? " Also, " + nullMessages.join(" ") : "");
+                        document.getElementById("weights-info").textContent = weightsInfo;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        document.getElementById("answer-box").textContent = "Error fetching books.";
+                    });
+            }
+        }
+
 
 
 
