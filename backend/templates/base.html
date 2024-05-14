@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 
+
 <head>
     <title> Book Hub</title>
     <link rel="stylesheet" href="/static/style.css">
@@ -8,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit&family=Montserrat&family=Open+Sans:wght@500&display=swap"
         rel="stylesheet">
+
 
     <style>
         html,
@@ -24,6 +26,7 @@
             overflow-x: hidden;
         }
 
+
         body {
             background: url("/static/images/office.jpg") no-repeat center center fixed;
             background-repeat: no-repeat, no-repeat;
@@ -34,6 +37,7 @@
             width: 100%;
             overflow-x: hidden;
         }
+
 
         .introduction-page {
             height: 100vh;
@@ -46,6 +50,7 @@
             background: url("/static/images/bookshop.png") no-repeat center center fixed;
             background-size: cover;
         }
+
 
         .introduction-text {
             width: 600px;
@@ -66,15 +71,18 @@
             gap: 10px;
         }
 
+
         .introduction-text p {
             margin-top: 10px;
             margin-bottom: 10px;
         }
 
+
         .button-group {
             margin-top: 5px;
             margin-bottom: 5px;
         }
+
 
         .star-rating {
             font-size: 24px;
@@ -86,6 +94,7 @@
             height: 24px;
             /* Make this the same height as your stars */
         }
+
 
         .star-rating .full-stars,
         .star-rating .empty-stars {
@@ -99,6 +108,7 @@
             /* No wrapping to a new line */
         }
 
+
         .star-rating .empty-stars::before {
             content: "\u2606\u2606\u2606\u2606\u2606";
             /* Five outlined stars */
@@ -106,6 +116,7 @@
             /* Light gray color */
             z-index: 0;
         }
+
 
         .star-rating .full-stars::before {
             content: "\u2605\u2605\u2605\u2605\u2605";
@@ -119,6 +130,7 @@
             /* To hide the overflowing stars */
         }
 
+
         .full-body-container,
         .full-body-container-2,
         p,
@@ -130,7 +142,9 @@
         h6 {
             text-align: center;
 
+
         }
+
 
         .recommendation-container {
             position: relative;
@@ -146,11 +160,13 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
+
         .recommendation-container:hover {
             border-color: orange;
             border-width: 5px;
             box-shadow: 0 10px 20px 5px rgba(0, 0, 0, 0.6);
         }
+
 
         .book-image {
             width: 150px;
@@ -159,12 +175,14 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+
         #answer-box {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%
         }
+
 
         .autocom-box ul {
             background-color: #F4ECD7;
@@ -173,18 +191,22 @@
             margin: 0;
         }
 
+
         .autocom-box ul li {
             background-color: #F4ECD7;
             padding: 10px;
             margin-bottom: 5px;
             border-bottom: 1px solid #ddd;
 
+
         }
+
 
         .autocom-box-2 {
             background-color: #F4ECD7;
             position: relative;
         }
+
 
         .input-box {
             border-radius: 50px;
@@ -197,11 +219,14 @@
             width: 600px;
             background-color: transparent;
 
+
         }
+
 
         .input-box input {
             background-color: transparent;
         }
+
 
         .input-box img {
             position: absolute;
@@ -211,6 +236,7 @@
             z-index: 10;
         }
 
+
         .input-box input[type="text"] {
             width: 100%;
             padding: 10px;
@@ -219,20 +245,24 @@
             outline: none;
         }
 
+
         .book-title {
             color: #8A6E43;
             font-weight: bold;
         }
+
 
         .book-description {
             color: #091241;
             line-height: 1.5;
         }
 
+
         .book-review-score {
             font-weight: bold;
             margin-top: 15px;
         }
+
 
         .book-version-title {
             color: #8A6E43;
@@ -241,11 +271,13 @@
             margin-bottom: 10px;
         }
 
+
         .book-version-descript {
             color: #515151;
             line-height: 1.5;
             margin-top: 0;
         }
+
 
         .book-image {
             width: auto;
@@ -256,23 +288,26 @@
             border-radius: 5px;
         }
 
+
         .scroll {
             font-size: 18px;
         }
 
+
         .loading-message {
             display: none;
             position: absolute;
-            top: 100%; 
+            top: 100%;
             left: 50%;
             transform: translate(-50%, -100px);
             font-size: 15px;
             padding: 5px 15px;
             border-radius: 5px;
-            z-index: 1000; 
+            z-index: 1000;
         }
     </style>
 </head>
+
 
 <body>
     <div class="introduction-page" style="display: block;">
@@ -317,7 +352,10 @@
             </div>
 
 
+
+
         </div>
+
 
     </div>
     <!-- This is for the search page based on favorite book -->
@@ -354,9 +392,11 @@
             </div>
         </div>
         <div class="autocom-box"></div>
-        <div id="loading" class="loading-message" style="display: none; font-size: 20px; color: rgb(38, 0, 255);">Loading...</div>
+        <div id="loading" class="loading-message" style="display: none; font-size: 20px; color: rgb(38, 0, 255);">
+            Loading...</div>
         <div id="answer-box"> </div>
     </div>
+
 
     <!-- This is for the SVD search page -->
     <div class="full-body-container-2" style="display: none;">
@@ -387,28 +427,32 @@
             </div>
         </div>
         <div class="autocom-box-2"></div>
-        <div id="loading-2" class="loading-message" style="display: none; font-size: 20px; color: rgb(38, 0, 255);">Loading...</div>
+        <div id="loading-2" class="loading-message" style="display: none; font-size: 20px; color: rgb(38, 0, 255);">
+            Loading...</div>
         <div id="answer-box-2"> </div>
     </div>
     <script src="../static/books_titles.js"></script>
     <script src="../static/moods.js"></script>
 
+
     <script>
-        let loadingInterval; 
+        let loadingInterval;
+
 
         function startLoadingAnimation(elementId) {
             let dotCount = 0;
             document.getElementById(elementId).style.display = "block";
             loadingInterval = setInterval(() => {
-                dotCount = (dotCount + 1) % 4; 
-                let dots = ".".repeat(dotCount); 
-                document.getElementById(elementId).textContent = "Loading" + dots; 
-            }, 500); 
+                dotCount = (dotCount + 1) % 4;
+                let dots = ".".repeat(dotCount);
+                document.getElementById(elementId).textContent = "Loading" + dots;
+            }, 500);
         }
 
+
         function stopLoadingAnimation(elementId) {
-            clearInterval(loadingInterval); 
-            document.getElementById(elementId).style.display = "none"; 
+            clearInterval(loadingInterval);
+            document.getElementById(elementId).style.display = "none";
         }
         const resultBox = document.querySelector('.autocom-box-2');
         const input = document.getElementById('mood-input');
@@ -426,6 +470,7 @@
                 showSuggestions2(emptyArray);
                 let allList = resultBox.querySelectorAll('ul');
 
+
                 for (let i = 0; i < allList.length; i++) {
                     allList[i].setAttribute('onclick', 'select2(this)');
                 }
@@ -433,6 +478,7 @@
                 resultBox.classList.remove('active'); // hide autocomplete box
             }
         };
+
 
         function showSuggestions2(list) {
             let listData;
@@ -445,6 +491,7 @@
             resultBox.innerHTML = listData;
         };
 
+
         function select2(element) {
             let selectData = element.textContent;
             input.value = selectData;
@@ -452,6 +499,8 @@
             resultBox.classList.remove('active');
             input.focus();
         };
+
+
 
 
         function answerBox2(title, authors, description, score, count, image, simscore) {
@@ -463,6 +512,7 @@
             score = (score !== undefined) ? score : "There's no review score";
             count = (count !== undefined) ? count : "no";
             const starRatingHtml = generateStarRating(score);
+
 
             return `
                 <div class='recommendation-container'>
@@ -482,23 +532,30 @@
             let roundedScore = Math.round(score);
             let starsHtml = '';
 
+
             // Add full stars to HTML
             for (let i = 0; i < roundedScore; i++) {
                 starsHtml += '&#9733;'; // HTML entity for a full star
             }
+
 
             // Add empty stars for the remainder to make up to 5 stars
             for (let i = roundedScore; i < 5; i++) {
                 starsHtml += '&#9734;'; // HTML entity for an empty star
             }
 
+
             return starsHtml;
         }
+
+
 
 
         function sendFocus2() {
             document.getElementById('mood-input').focus();
         };
+
+
 
 
         function showMood() {
@@ -520,6 +577,7 @@
             }
         };
 
+
         // Help switch from intro page to the search page
         function showSearch(containerClass) {
             document.querySelector('.introduction-page').style.display = 'none';
@@ -539,7 +597,10 @@
         const icon = document.getElementsByClassName('fa-search');
 
 
+
+
         let webLink;
+
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -550,12 +611,14 @@
             }
         });
 
+
         // search icon onclick
         icon.onclick = () => {
             searchWrapper.classList.remove('active');
             query();
             return;
         };
+
 
         // if user presses any key and releases
         inputBox.onkeyup = (e) => {
@@ -579,6 +642,7 @@
             }
         };
 
+
         function select(element) {
             let selectData = element.textContent;
             inputBox.value = selectData;
@@ -587,7 +651,9 @@
             inputBox.focus();
         };
 
+
         function showSuggestions(list) {
+
 
             let listData;
             if (!list.length) {
@@ -599,9 +665,11 @@
             suggBox.innerHTML = listData;
         };
 
+
         inputBox.addEventListener('focusout', (e) =>
             setTimeout(() => searchWrapper.classList.remove('active'), 200)
         );
+
 
         function answerBoxTemplate(title, authors, categories, description, score, count, image) {
             //to make sure if any of these is undefined, to replace it with the following
@@ -612,6 +680,7 @@
             score = (score !== undefined) ? score : "There's no review score";
             count = (count !== undefined) ? count : "no";
             const starRatingHtml = generateStarRating(score);
+
 
             return `
                 <div class='recommendation-container'>
@@ -628,19 +697,25 @@
         };
 
 
+
+
         function sendFocus() {
             document.getElementsByClassName('input-box').focus();
         };
+
 
         function query() {
             startLoadingAnimation("loading");
             searchWrapper.classList.remove('active');
 
+
             let searchParams = new URLSearchParams();
             searchParams.append('title', inputBox.value);
 
+
             let searchText = inputBox.value.trim();
             suggBox.innerHTML = "";
+
 
             if (searchText !== "") {
                 fetch("/books?" + new URLSearchParams({ title: searchText }).toString())
@@ -649,8 +724,9 @@
                         stopLoadingAnimation("loading");
                         document.getElementById("weights-info").textContent = data.weights_description; // Update the weights information
 
+
                         let output_div = document.getElementById("answer-box");
-                        output_div.innerHTML = ""; 
+                        output_div.innerHTML = "";
                         if (data.books && data.books.length > 0) {
                             data.books.forEach(book => {
                                 let tempDiv = document.createElement("div");
@@ -679,8 +755,13 @@
 
 
 
+
+
+
     </script>
 
+
 </body>
+
 
 </html>
